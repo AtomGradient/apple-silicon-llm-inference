@@ -16,8 +16,6 @@ Experiment workspace for the paper:
 | M1 Max (103)   | Apple M1 Max   |  32 GB | 400 GB/s | 192.168.0.103 |
 | M2 Pro (104)   | Apple M2 Pro   |  32 GB | 200 GB/s | 192.168.0.104 |
 
-SSH access from 113: `ssh alex@192.168.0.103` / `ssh atomgradient@192.168.0.104`
-
 Python env (all machines): `source ~/Documents/mlx-community/3-11-mlx-community-env/bin/activate`
 
 ---
