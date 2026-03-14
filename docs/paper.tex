@@ -921,6 +921,22 @@ consumer hardware and suggest that future work on speculative decoding for
 unified-memory architectures should focus on speed ratio optimization rather
 than acceptance rate maximization.
 
+\medskip
+\noindent\textbf{Practical recommendations.}
+\begin{itemize}[leftmargin=*, itemsep=2pt]
+  \item \textbf{Quantization:} Use Q6\_K as the default production format
+    (best speed/quality trade-off). Prefer Q8\_0 when memory allows (near-lossless).
+    Fall back to Q4\_K\_M only under memory pressure. Avoid Q3\_K\_M and below.
+  \item \textbf{Speculative decoding:} Pair a 0.8B draft with a 7B+ dense
+    target to guarantee a speed ratio $>2.5\times$ and achieve $\sim$25\%
+    throughput gain. Do not apply SD to MoE models or dense models $\leq$4B.
+  \item \textbf{Self-speculative decoding:} Not viable on unified memory;
+    same-model quantization variants cannot reach the required speed ratio.
+  \item \textbf{Cross-device SD:} GGML\_RPC is not production-ready due to
+    per-op protocol overhead. Defer until a batched forward-pass protocol
+    is available.
+\end{itemize}
+
 % ============================================================
 \section*{Acknowledgements}
 % ============================================================

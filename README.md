@@ -135,6 +135,31 @@ See [`paper/results/benchmark_results.json`](paper/results/benchmark_results.jso
 
 ---
 
+## Key Findings in Plain Language
+
+**1. Speed bottleneck is memory bandwidth, not compute.**
+Quantization cuts model size → fewer bytes loaded per token → faster generation. Halve the model size, roughly halve the load time. Memory bandwidth difference between machines directly predicts throughput: M2 Ultra (800 GB/s) is ~3.3× faster than M2 Pro (200 GB/s) on the same model.
+
+**2. Q6_K is the sweet spot for production.**
+- **Q8_0** — nearly lossless (0.18% PPL), use when memory is plentiful
+- **Q6_K ★** — best balance: 1.68× faster than F16, 59% smaller, only 0.54% quality loss
+- **Q4_K_M** — memory-constrained fallback: 4% quality loss, 68% smaller
+- **Q2_K** — avoid: output degenerates (PPL +267%), marginal speed gain not worth it
+
+**3. For speculative decoding, speed ratio beats acceptance rate.**
+The Metal GPU verifies a batch of draft tokens almost as fast as one token — so even a 2–3% acceptance rate is profitable, as long as the draft model is fast enough. The rule: draft must run ≥2.5× faster than the target. A 0.8B draft (140 tok/s) with a 9B target (42 tok/s) = 3.3× ratio → **+25.7% throughput**.
+
+**4. Self-speculative decoding doesn't work on unified memory.**
+Using a lower-precision copy of the same model as draft (e.g., 4B Q2 drafting for 4B Q8) can only reach a 1.35× speed ratio — well below the 2.5× threshold. Both models share the same memory bus, so they can't outrun each other enough.
+
+**5. MoE models and speculative decoding don't mix.**
+The 35B-A3B MoE only activates ~3B parameters per token, so it already runs at small-model speeds (~55 tok/s). There's not enough headroom for the draft model to add value.
+
+**6. Cross-device SD via GGML_RPC is not ready for production.**
+Routing the draft model to a remote machine over Gigabit Ethernet caused **79–83% throughput loss** — not because of network bandwidth, but because GGML_RPC sends one network round-trip per GGML operation (~50 ms overhead per draft token). A purpose-built protocol that batches the entire forward pass into one call would fix this.
+
+---
+
 ## Dependencies
 
 | Tool | Version / Notes |
