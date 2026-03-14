@@ -1,0 +1,3 @@
+title: "Efficient On-Device LLM Inference on Apple Silicon"
+description: "From quantization to speculative decoding: a systematic empirical study on M2 Ultra unified memory. By AtomGradient."
+theme: null

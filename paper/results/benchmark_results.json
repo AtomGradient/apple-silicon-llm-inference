@@ -1,0 +1,364 @@
+{
+  "metadata": {
+    "paper": "Efficient On-Device LLM Inference on Apple Silicon: From Quantization to Collaborative Speculative Decoding",
+    "author": "AtomGradient",
+    "date": "2026-03-14",
+    "hardware": {
+      "M2_Ultra_192GB": {
+        "chip": "Apple M2 Ultra",
+        "memory_gb": 192,
+        "memory_bandwidth_gbs": 800,
+        "cpu_cores": 24,
+        "gpu_cores": 76,
+        "neural_engine_tops": 31.6
+      },
+      "M1_Max_32GB": {
+        "chip": "Apple M1 Max",
+        "memory_gb": 32,
+        "memory_bandwidth_gbs": 400,
+        "cpu_cores": 10,
+        "gpu_cores": 32,
+        "neural_engine_tops": 11.0
+      },
+      "M2_Pro_32GB": {
+        "chip": "Apple M2 Pro",
+        "memory_gb": 32,
+        "memory_bandwidth_gbs": 200,
+        "cpu_cores": 12,
+        "gpu_cores": 19,
+        "neural_engine_tops": 15.8
+      }
+    },
+    "tools": {
+      "llama_cpp": "llama-bench / llama-perplexity / llama-speculative (GGML_RPC=ON)",
+      "mlx": "mlx_lm.generate",
+      "n_prompt": 512,
+      "n_gen": 128,
+      "n_runs": 4,
+      "dataset_ppl": "WikiText-2 Raw v1 test split, --chunks 10, ctx=512"
+    }
+  },
+
+  "phase1_quantization_bench": {
+    "description": "Qwen3.5-4B GGUF multi-precision benchmark on M2 Ultra 192GB",
+    "model": "Qwen3.5-4B",
+    "machine": "M2_Ultra_192GB",
+    "results": [
+      {"quant": "F16",    "tg_tps": 36.79,  "pp_tps": 1931.6, "size_gb": 8.42, "tg_speedup_vs_f16": 1.00},
+      {"quant": "Q8_0",   "tg_tps": 54.02,  "pp_tps": 1373.6, "size_gb": 4.48, "tg_speedup_vs_f16": 1.47},
+      {"quant": "Q6_K",   "tg_tps": 61.98,  "pp_tps": 1358.9, "size_gb": 3.46, "tg_speedup_vs_f16": 1.68},
+      {"quant": "Q5_K_M", "tg_tps": 56.60,  "pp_tps": 1276.1, "size_gb": 3.11, "tg_speedup_vs_f16": 1.54},
+      {"quant": "Q4_K_M", "tg_tps": 58.47,  "pp_tps": 1337.6, "size_gb": 2.71, "tg_speedup_vs_f16": 1.59},
+      {"quant": "Q3_K_M", "tg_tps": 68.75,  "pp_tps": 1611.9, "size_gb": 2.26, "tg_speedup_vs_f16": 1.87},
+      {"quant": "Q2_K",   "tg_tps": 72.77,  "pp_tps": 1700.9, "size_gb": 1.80, "tg_speedup_vs_f16": 1.98}
+    ]
+  },
+
+  "phase1_multisize_bench": {
+    "description": "Multi-size Qwen3.5 GGUF benchmark on M2 Ultra 192GB",
+    "machine": "M2_Ultra_192GB",
+    "results": [
+      {"model": "Qwen3.5-0.8B Q8_0",           "tg_tps": 140.19, "pp_tps": 7410.7,  "size_gb": 1.19},
+      {"model": "Qwen3.5-2B Q8_0",             "tg_tps": 110.62, "pp_tps": 4469.2,  "size_gb": 2.83},
+      {"model": "Qwen3.5-4B F16",              "tg_tps": 36.79,  "pp_tps": 1931.6,  "size_gb": 8.42},
+      {"model": "Qwen3.5-4B Q4_K_M",           "tg_tps": 58.47,  "pp_tps": 1337.6,  "size_gb": 2.71},
+      {"model": "Qwen3.5-9B Q8_0",             "tg_tps": 42.42,  "pp_tps": 1163.9,  "size_gb": 12.97},
+      {"model": "Qwen3.5-35B-A3B Q8_0 (MoE)",  "tg_tps": 50.01,  "pp_tps": 1530.5,  "size_gb": 36.04,
+       "note": "Only ~3B params active per token; requires 192GB unified memory"}
+    ]
+  },
+
+  "phase1_hardware_comparison": {
+    "description": "Three-machine hardware comparison on Qwen3.5-9B Q8_0",
+    "model": "Qwen3.5-9B Q8_0",
+    "results": [
+      {"machine": "M2_Ultra_192GB", "chip": "M2 Ultra", "memory_bw_gbs": 800, "tg_tps": 42.42, "pp_tps": 1163.9, "tg_bw_util_pct": 69.1},
+      {"machine": "M1_Max_32GB",    "chip": "M1 Max",   "memory_bw_gbs": 400, "tg_tps": 21.77, "pp_tps": 483.7,  "tg_bw_util_pct": 70.9},
+      {"machine": "M2_Pro_32GB",    "chip": "M2 Pro",   "memory_bw_gbs": 200, "tg_tps": 12.69, "pp_tps": 321.3,  "tg_bw_util_pct": 82.4}
+    ],
+    "note": "tg_bw_util = tg_tps × model_size_gb / memory_bw_gbs × 100. Model size = 12.07 GB (Q8_0 actual bytes)"
+  },
+
+  "phase1_hardware_multimodel_bench": {
+    "description": "Multi-model benchmark across all three Apple Silicon machines",
+    "model_family": "Qwen3.5 GGUF Q8_0",
+    "results": {
+      "M2_Ultra_192GB": [
+        {"model": "0.8B Q8_0", "tg_tps": 140.19, "pp_tps": 7410.7},
+        {"model": "2B Q8_0",   "tg_tps": 110.62, "pp_tps": 4469.2},
+        {"model": "9B Q8_0",   "tg_tps":  42.42, "pp_tps": 1163.9},
+        {"model": "35B-A3B Q8_0 (MoE)", "tg_tps": 50.01, "pp_tps": 1530.5}
+      ],
+      "M1_Max_32GB": [
+        {"model": "0.8B Q8_0", "tg_tps":  86.62, "pp_tps": 3473.5},
+        {"model": "2B Q8_0",   "tg_tps":  62.45, "tg_std": 0.056, "pp_tps": 1980.7, "pp_std": 10.3, "note": "6-run stable measurement after rpath fix"},
+        {"model": "9B Q8_0",   "tg_tps":  21.77, "pp_tps":  483.7}
+      ],
+      "M2_Pro_32GB": [
+        {"model": "0.8B Q8_0", "tg_tps":  62.94, "pp_tps": 2380.7},
+        {"model": "2B Q8_0",   "tg_tps":  42.09, "pp_tps": 1344.1},
+        {"model": "9B Q8_0",   "tg_tps":  12.69, "pp_tps":  321.3}
+      ]
+    },
+    "note": "35B-A3B model requires 36 GB, only fits in M2 Ultra 192GB machine"
+  },
+
+  "phase1_mlx_bench": {
+    "description": "MLX framework benchmark on M2 Ultra 192GB",
+    "machine": "M2_Ultra_192GB",
+    "framework": "MLX",
+    "results": {
+      "gemma3_qat": [
+        {"model": "Gemma-3-4B QAT 3bit", "tg_tps": 137.32, "tg_std": 0.31, "size_mb": 2871.0},
+        {"model": "Gemma-3-4B QAT 4bit", "tg_tps": 119.01, "tg_std": 0.09, "size_mb": 3048.8},
+        {"model": "Gemma-3-4B QAT 6bit", "tg_tps": 107.18, "tg_std": 0.24, "size_mb": 4577.7},
+        {"model": "Gemma-3-4B QAT 8bit", "tg_tps": 96.40,  "tg_std": 0.18, "size_mb": 5715.5}
+      ],
+      "qwen35_multisize": [
+        {"model": "Qwen3.5-0.8B (bf16)", "tg_tps": 177.63, "tg_std": 0.39, "size_mb": 1770.0},
+        {"model": "Qwen3.5-4B (bf16)",   "tg_tps": 59.33,  "tg_std": 0.66, "size_mb": 9342.9},
+        {"model": "Qwen3.5-9B (bf16)",   "tg_tps": 27.27,  "tg_std": 1.88, "size_mb": 19329.4}
+      ],
+      "qwen3_8b_ptq": [
+        {"model": "Qwen3-8B 3bit", "tg_tps": 74.37, "tg_std": 19.56, "size_mb": 3600.0,
+         "note": "High stddev — MLX cache warmup issue"},
+        {"model": "Qwen3-8B 4bit", "tg_tps": 72.98, "tg_std": 19.83, "size_mb": 4622.1,
+         "note": "High stddev — MLX cache warmup issue"},
+        {"model": "Qwen3-8B 6bit", "tg_tps": 54.25, "tg_std": 3.96,  "size_mb": 6689.4}
+      ]
+    }
+  },
+
+  "phase2_perplexity": {
+    "description": "Perplexity on WikiText-2 test split (chunks=10, ctx=512), Qwen3.5-4B",
+    "machine": "M2_Ultra_192GB",
+    "baseline_ppl": 11.0554,
+    "results": [
+      {"quant": "F16",    "ppl": 11.0554, "ppl_std": 0.6036, "delta_ppl": 0.0000, "delta_pct": 0.00,
+       "size_gb": 8.42, "tg_tps": 36.79},
+      {"quant": "Q8_0",   "ppl": 11.0752, "ppl_std": 0.6053, "delta_ppl": 0.0198, "delta_pct": 0.18,
+       "size_gb": 4.48, "tg_tps": 54.02},
+      {"quant": "Q6_K",   "ppl": 11.1145, "ppl_std": 0.6065, "delta_ppl": 0.0591, "delta_pct": 0.54,
+       "size_gb": 3.46, "tg_tps": 61.98},
+      {"quant": "Q5_K_M", "ppl": 11.2483, "ppl_std": 0.6188, "delta_ppl": 0.1929, "delta_pct": 1.74,
+       "size_gb": 3.11, "tg_tps": 56.60},
+      {"quant": "Q4_K_M", "ppl": 11.5037, "ppl_std": 0.6335, "delta_ppl": 0.4483, "delta_pct": 4.07,
+       "size_gb": 2.71, "tg_tps": 58.47},
+      {"quant": "Q3_K_M", "ppl": 12.6678, "ppl_std": 0.7126, "delta_ppl": 1.6124, "delta_pct": 14.57,
+       "size_gb": 2.26, "tg_tps": 68.75},
+      {"quant": "Q2_K",   "ppl": 40.6023, "ppl_std": 2.6316, "delta_ppl": 29.5469, "delta_pct": 267.4,
+       "size_gb": 1.80, "tg_tps": 72.77}
+    ]
+  },
+
+  "phase3_speculative_decoding": {
+    "description": "Speculative decoding experiments on M2 Ultra 192GB (k=4 unless noted, T=0 greedy)",
+    "machine": "M2_Ultra_192GB",
+    "baselines": {
+      "9B_Q8":  {"tg_tps": 42.42, "model": "Qwen3.5-9B Q8_0"},
+      "4B_Q8":  {"tg_tps": 54.02, "model": "Qwen3.5-4B Q8_0"},
+      "35B_Q4": {"tg_tps": 55.20, "model": "Qwen3.5-35B-A3B Q4_K_XL (MoE)"}
+    },
+    "draft_speeds": {
+      "0.8B_Q8": 140.19,
+      "2B_Q8":   110.62,
+      "4B_Q2":   72.77,
+      "4B_Q3":   68.75,
+      "4B_Q4":   58.47,
+      "4B_Q6":   61.98
+    },
+    "results": [
+      {
+        "target": "9B_Q8", "draft": "0.8B_Q8", "k": 4,
+        "draft_target_speed_ratio": 3.31,
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0441, "eff_tps": 55.14},
+          {"prompt": "text", "accept_rate": 0.0232, "eff_tps": 51.19},
+          {"prompt": "math", "accept_rate": 0.0325, "eff_tps": 53.60}
+        ],
+        "avg_accept_rate": 0.0333, "avg_eff_tps": 53.31,
+        "speedup_vs_baseline": 0.257
+      },
+      {
+        "target": "9B_Q8", "draft": "0.8B_Q8", "k": 8,
+        "draft_target_speed_ratio": 3.31,
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0116, "eff_tps": 53.62},
+          {"prompt": "text", "accept_rate": 0.0059, "eff_tps": 51.03},
+          {"prompt": "math", "accept_rate": 0.0221, "eff_tps": 53.45}
+        ],
+        "avg_accept_rate": 0.0133, "avg_eff_tps": 52.70,
+        "speedup_vs_baseline": 0.243
+      },
+      {
+        "target": "9B_Q8", "draft": "2B_Q8", "k": 4,
+        "draft_target_speed_ratio": 2.61,
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0355, "eff_tps": 50.23},
+          {"prompt": "text", "accept_rate": 0.0262, "eff_tps": 46.43},
+          {"prompt": "math", "accept_rate": 0.0390, "eff_tps": 48.69}
+        ],
+        "avg_accept_rate": 0.0336, "avg_eff_tps": 48.45,
+        "speedup_vs_baseline": 0.142
+      },
+      {
+        "target": "9B_Q8", "draft": "2B_Q8", "k": 8,
+        "draft_target_speed_ratio": 2.61,
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0311, "eff_tps": 48.87},
+          {"prompt": "text", "accept_rate": 0.0039, "eff_tps": 46.03},
+          {"prompt": "math", "accept_rate": 0.0073, "eff_tps": 48.44}
+        ],
+        "avg_accept_rate": 0.0141, "avg_eff_tps": 47.78,
+        "speedup_vs_baseline": 0.127
+      },
+      {
+        "target": "4B_Q8", "draft": "4B_Q2", "k": 4,
+        "draft_target_speed_ratio": 1.35,
+        "note": "Self-speculative: same model, lower quantization",
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0606, "eff_tps": 41.69},
+          {"prompt": "text", "accept_rate": 0.0549, "eff_tps": 38.46},
+          {"prompt": "math", "accept_rate": 0.0341, "eff_tps": 40.96}
+        ],
+        "avg_accept_rate": 0.0499, "avg_eff_tps": 40.37,
+        "speedup_vs_baseline": -0.252
+      },
+      {
+        "target": "4B_Q8", "draft": "4B_Q3", "k": 4,
+        "draft_target_speed_ratio": 1.27,
+        "note": "Self-speculative: same model, lower quantization",
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0174, "eff_tps": 41.13},
+          {"prompt": "text", "accept_rate": 0.0203, "eff_tps": 38.02},
+          {"prompt": "math", "accept_rate": 0.0568, "eff_tps": 39.95}
+        ],
+        "avg_accept_rate": 0.0315, "avg_eff_tps": 39.70,
+        "speedup_vs_baseline": -0.265
+      },
+      {
+        "target": "4B_Q8", "draft": "4B_Q4", "k": 4,
+        "draft_target_speed_ratio": 1.08,
+        "note": "Self-speculative: same model, lower quantization",
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0216, "eff_tps": 41.31},
+          {"prompt": "text", "accept_rate": 0.0188, "eff_tps": 38.95},
+          {"prompt": "math", "accept_rate": 0.0833, "eff_tps": 40.82}
+        ],
+        "avg_accept_rate": 0.0413, "avg_eff_tps": 40.36,
+        "speedup_vs_baseline": -0.253
+      },
+      {
+        "target": "4B_Q8", "draft": "4B_Q6", "k": 4,
+        "draft_target_speed_ratio": 1.15,
+        "note": "Self-speculative: same model, lower quantization",
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0077, "eff_tps": 41.48},
+          {"prompt": "text", "accept_rate": 0.0217, "eff_tps": 38.42},
+          {"prompt": "math", "accept_rate": 0.1468, "eff_tps": 40.28}
+        ],
+        "avg_accept_rate": 0.0588, "avg_eff_tps": 40.06,
+        "speedup_vs_baseline": -0.259
+      },
+      {
+        "target": "35B_Q4", "draft": "0.8B_Q8", "k": 4,
+        "draft_target_speed_ratio": 2.54,
+        "note": "MoE target: ~3B active params per token",
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0341, "eff_tps": 55.48},
+          {"prompt": "text", "accept_rate": 0.0146, "eff_tps": 51.59},
+          {"prompt": "math", "accept_rate": 0.0374, "eff_tps": 53.94}
+        ],
+        "avg_accept_rate": 0.0287, "avg_eff_tps": 53.67,
+        "speedup_vs_baseline": -0.028
+      },
+      {
+        "target": "35B_Q4", "draft": "4B_Q4", "k": 4,
+        "draft_target_speed_ratio": 1.06,
+        "note": "MoE target with larger draft",
+        "by_prompt": [
+          {"prompt": "code", "accept_rate": 0.0091, "eff_tps": 39.05},
+          {"prompt": "text", "accept_rate": 0.0038, "eff_tps": 36.17},
+          {"prompt": "math", "accept_rate": 0.0685, "eff_tps": 37.94}
+        ],
+        "avg_accept_rate": 0.0271, "avg_eff_tps": 37.72,
+        "speedup_vs_baseline": -0.317
+      }
+    ],
+    "key_findings": {
+      "min_speed_ratio_for_benefit": 2.5,
+      "best_config": "0.8B_Q8 draft → 9B_Q8 target, k=4: +25.7% speedup",
+      "self_speculative_viable": false,
+      "moe_compatible": false
+    }
+  },
+
+  "phase3_cross_device_sd": {
+    "description": "Cross-device speculative decoding via GGML_RPC over 1 Gbps LAN. Target model (9B Q8) runs on M2 Ultra. Draft model (0.8B Q8) compute dispatched to remote no-BLAS rpc-server. k=4, T=0 greedy, 200 output tokens.",
+    "target_machine": "M2_Ultra_192GB",
+    "target_model": "Qwen3.5-9B Q8_0",
+    "draft_model": "Qwen3.5-0.8B Q8_0",
+    "k": 4,
+    "network": "1 Gbps Ethernet LAN",
+    "rpc_server_build": "GGML_RPC=ON, GGML_BLAS=OFF (no-BLAS; BLAS build caused abort and silent local fallback)",
+    "investigation_notes": [
+      "Initial BLAS-enabled rpc-server showed text=51.01, math=53.79 tok/s — effectively identical to local SD (51.10, 54.05).",
+      "Acceptance rates for BLAS results (0.0232, 0.0325) were IDENTICAL to local baseline, confirming draft ran locally (BLAS/Metal backend conflict caused silent fallback to local M2 Ultra compute).",
+      "No-BLAS rpc-server correctly routes draft to remote Metal GPU. M1 Max and M2 Pro produce numerically identical draft tokens (same Metal shader numerics at temp=0).",
+      "RPC protocol overhead: ~51ms per draft token (vs 11.5ms local). Root cause is GGML_RPC issuing per-op RPC calls rather than batched forward passes."
+    ],
+    "results": [
+      {
+        "rpc_backend": "local",
+        "rpc_server": "none",
+        "note": "Baseline: draft compute on M2 Ultra itself",
+        "by_prompt": [
+          {"prompt": "code", "n_drafted": 680, "n_accept": 30, "accept_rate": 0.0441, "eff_tps": 55.80, "total_ms": 4084.56, "total_tokens": 228},
+          {"prompt": "text", "n_drafted": 732, "n_accept": 17, "accept_rate": 0.0232, "eff_tps": 51.46, "total_ms": 4100.55, "total_tokens": 211},
+          {"prompt": "math", "n_drafted": 708, "n_accept": 23, "accept_rate": 0.0325, "eff_tps": 54.09, "total_ms": 4085.90, "total_tokens": 221}
+        ],
+        "avg_eff_tps": 53.78,
+        "vs_local_pct": 0.0
+      },
+      {
+        "rpc_backend": "103_M1Max",
+        "rpc_server": "192.168.0.103:50052",
+        "remote_machine": "M1 Max 32GB (Apple M1 Max, 400 GB/s)",
+        "note": "No-BLAS rpc-server. All 3 prompts completed. Draft compute on M1 Max Metal GPU via RPC.",
+        "draft_tps_via_rpc": 16.0,
+        "draft_tps_local_reference": 86.62,
+        "rpc_overhead_per_token_ms": 51.0,
+        "by_prompt": [
+          {"prompt": "code", "n_drafted": 584, "n_accept": 54,  "accept_rate": 0.0925, "eff_tps": 11.15, "total_ms": 20436.0,  "total_tokens": 228},
+          {"prompt": "text", "n_drafted": 240, "n_accept": 140, "accept_rate": 0.5833, "eff_tps": 11.18, "total_ms": 18867.9,  "total_tokens": 211},
+          {"prompt": "math", "n_drafted": 256, "n_accept": 136, "accept_rate": 0.5313, "eff_tps": 11.26, "total_ms": 19631.7,  "total_tokens": 221}
+        ],
+        "avg_eff_tps": 11.20,
+        "vs_local_pct": -79.2
+      },
+      {
+        "rpc_backend": "104_M2Pro",
+        "rpc_server": "192.168.0.104:50052",
+        "remote_machine": "M2 Pro 32GB (Apple M2 Pro, 200 GB/s)",
+        "note": "No-BLAS rpc-server. All 3 prompts completed. Draft compute on M2 Pro Metal GPU via RPC.",
+        "draft_tps_via_rpc": 14.2,
+        "draft_tps_local_reference": 62.94,
+        "rpc_overhead_per_token_ms": 57.0,
+        "by_prompt": [
+          {"prompt": "code", "n_drafted": 584, "n_accept": 54,  "accept_rate": 0.0925, "eff_tps": 9.66, "total_ms": 23603.1,  "total_tokens": 228},
+          {"prompt": "text", "n_drafted": 240, "n_accept": 140, "accept_rate": 0.5833, "eff_tps": 8.77, "total_ms": 24059.2,  "total_tokens": 211},
+          {"prompt": "math", "n_drafted": 256, "n_accept": 136, "accept_rate": 0.5313, "eff_tps": 9.71, "total_ms": 22772.2,  "total_tokens": 221}
+        ],
+        "avg_eff_tps": 9.38,
+        "vs_local_pct": -82.6
+      }
+    ],
+    "key_findings": {
+      "overhead_vs_local": "~79-83% throughput reduction on Gigabit LAN (no-BLAS, correct measurement)",
+      "rpc_overhead_root_cause": "GGML_RPC issues per-op RPC calls; each draft token incurs ~51-57ms overhead vs 11.5ms local — not network bandwidth limited",
+      "blas_fallback_warning": "BLAS-enabled rpc-server silently falls back to local compute; measurements from BLAS builds are invalid for cross-device evaluation",
+      "acceptance_rate_note": "Remote Metal GPU (M1 Max, M2 Pro) produces different tokens from local M2 Ultra Metal at temp=0 (FP arithmetic differences), but M1 Max and M2 Pro produce identical tokens (same Metal shader numerics)",
+      "conclusion": "GGML_RPC cross-device SD is not currently viable for production use. RPC protocol overhead (~51-57ms/token) dominates. Purpose-built streaming protocol required."
+    }
+  }
+}

@@ -1,0 +1,17 @@
+=== Phase 1: llama-bench (M1Max_32GB) ===
+N_PROMPT=512, N_GEN=128, N_RUNS=3
+
+--- llama-bench 测试阶段 ---
+[00:09:07] Bench 9B_Q8 (13.0 GB)...
+  pp: 496.73 tps
+  tg: 22.57 tps
+[00:09:33] Bench 0.6B_Q4 (0.5 GB)...
+  pp: 5575.46 tps
+  tg: 195.35 tps
+
+=== 完成 | 结果: /Users/alex/Documents/Codes/FreeExplore/data/phase1_bench_103_m1max.csv ===
+
+Model                  PP (tps)   TG (tps)   Size(GB)
+----------------------------------------------------
+9B_Q8                     496.7       22.6       13.0
+0.6B_Q4                  5575.5      195.3        0.5

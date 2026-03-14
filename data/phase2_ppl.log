@@ -1,0 +1,34 @@
+Warning: You are sending unauthenticated requests to the HF Hub. Please set a HF_TOKEN to enable higher rate limits and faster downloads.
+=== Phase 2: Perplexity 评估 ===
+[下载] WikiText-2 测试集...
+[尝试] 从 HuggingFace 下载...
+Generating test split:   0%|          | 0/4358 [00:00<?, ? examples/s]Generating test split: 100%|██████████| 4358/4358 [00:00<00:00, 169407.93 examples/s]
+Generating train split:   0%|          | 0/36718 [00:00<?, ? examples/s]Generating train split: 100%|██████████| 36718/36718 [00:00<00:00, 3033295.01 examples/s]
+Generating validation split:   0%|          | 0/3760 [00:00<?, ? examples/s]Generating validation split: 100%|██████████| 3760/3760 [00:00<00:00, 2236327.71 examples/s]
+[OK] HF 下载成功: 1294336 chars
+[00:22:47] PPL 4B_F16 (8.42GB)...
+  PPL = 11.0554 ± 0.6036
+[00:22:52] PPL 4B_Q8_0 (4.48GB)...
+  PPL = 11.0752 ± 0.6053
+[00:22:56] PPL 4B_Q6_K (3.46GB)...
+  PPL = 11.1145 ± 0.6065
+[00:23:02] PPL 4B_Q5_K_M (3.11GB)...
+  PPL = 11.2483 ± 0.6188
+[00:23:07] PPL 4B_Q4_K_M (2.71GB)...
+  PPL = 11.5037 ± 0.6335
+[00:23:12] PPL 4B_Q3_K_M (2.26GB)...
+  PPL = 12.6678 ± 0.7126
+[00:23:17] PPL 4B_Q2_K (1.80GB)...
+  PPL = 40.6023 ± 2.6316
+
+=== 完成 7/7 | 结果: /Users/alex/Documents/Codes/FreeExplore/data/phase2_ppl_results.csv ===
+
+Model                PPL        ±   Size(GB)
+-------------------------------------------
+4B_F16           11.0554   0.6036       8.42
+4B_Q8_0          11.0752   0.6053       4.48
+4B_Q6_K          11.1145   0.6065       3.46
+4B_Q5_K_M        11.2483   0.6188       3.11
+4B_Q4_K_M        11.5037   0.6335       2.71
+4B_Q3_K_M        12.6678   0.7126       2.26
+4B_Q2_K          40.6023   2.6316       1.80

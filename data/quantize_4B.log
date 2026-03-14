@@ -1,0 +1,20 @@
+[00:15:55] 量化 Q2_K...
+main: quantize time = 25064.32 ms
+main:    total time = 25064.32 ms
+[00:16:21] Q2_K 完成: 1.7G
+[00:16:21] 量化 Q3_Kmain: main: quantize time = 24630.21 ms
+main:    total time = 24630.21 ms
+[00:16:45] Q3_K_M 完成: 2.1G
+[00:16:45] 量�main: quantimain: quantize time = 27992.23 ms
+main:    total time = 27992.23 ms
+[00:17:13] Q4_K_M 完成: 2.5G
+[00:17:13]main: quantize timmain: quantize time = 21140.22 ms
+main:    total time = 21140.22 ms
+[00:17:35] Q5_K_M 完成: 2.9G
+[0main: quantize time = 15main: quantize time = 13013.21 ms
+main:    total time = 13013.21 ms
+[00:17:48] Q6_K 完成: 3main: quantize time =  6059.66main: quantize time =  5722.92 ms
+main:    total time =  5722.92 ms
+[00:17:54] Q8_0 完成: 4.2G
+ALL_DONE
+�量化完成 ===

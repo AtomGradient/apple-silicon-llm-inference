@@ -1,0 +1,345 @@
+=== [Phase 1-A] 生成多精度 GGUF from Qwen3.5-9B Q8 ===
+[00:04:07] 生成 Q2_K ...
+main: build = 8240 (d088d5b74)
+main: built with AppleClang 17.0.0.17000404 for Darwin arm64
+main: quantizing '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf' to '/Users/alex/Documents/mlx-community/Qwen3.5-9B-quants/Qwen3.5-9B-Q2_K.gguf' as Q2_K
+llama_model_loader: loaded meta data with 46 key-value pairs and 427 tensors from /Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = qwen35
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Qwen3.5-9B
+llama_model_loader: - kv   3:                           general.basename str              = Qwen3.5-9B
+llama_model_loader: - kv   4:                       general.quantized_by str              = Unsloth
+llama_model_loader: - kv   5:                         general.size_label str              = 9B
+llama_model_loader: - kv   6:                            general.license str              = apache-2.0
+llama_model_loader: - kv   7:                       general.license.link str              = https://huggingface.co/Qwen/Qwen3.5-9...
+llama_model_loader: - kv   8:                           general.repo_url str              = https://huggingface.co/unsloth
+llama_model_loader: - kv   9:                   general.base_model.count u32              = 1
+llama_model_loader: - kv  10:                  general.base_model.0.name str              = Qwen3.5 9B
+llama_model_loader: - kv  11:          general.base_model.0.organization str              = Qwen
+llama_model_loader: - kv  12:              general.base_model.0.repo_url str              = https://huggingface.co/Qwen/Qwen3.5-9B
+llama_model_loader: - kv  13:                               general.tags arr[str,2]       = ["unsloth", "image-text-to-text"]
+llama_model_loader: - kv  14:                         qwen35.block_count u32              = 32
+llama_model_loader: - kv  15:                      qwen35.context_length u32              = 262144
+llama_model_loader: - kv  16:                    qwen35.embedding_length u32              = 4096
+llama_model_loader: - kv  17:                 qwen35.feed_forward_length u32              = 12288
+llama_model_loader: - kv  18:                qwen35.attention.head_count u32              = 16
+llama_model_loader: - kv  19:             qwen35.attention.head_count_kv u32              = 4
+llama_model_loader: - kv  20:             qwen35.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+llama_model_loader: - kv  21:                      qwen35.rope.freq_base f32              = 10000000.000000
+llama_model_loader: - kv  22:    qwen35.attention.layer_norm_rms_epsilon f32              = 0.000001
+llama_model_loader: - kv  23:                qwen35.attention.key_length u32              = 256
+llama_model_loader: - kv  24:              qwen35.attention.value_length u32              = 256
+llama_model_loader: - kv  25:                     qwen35.ssm.conv_kernel u32              = 4
+llama_model_loader: - kv  26:                      qwen35.ssm.state_size u32              = 128
+llama_model_loader: - kv  27:                     qwen35.ssm.group_count u32              = 16
+llama_model_loader: - kv  28:                  qwen35.ssm.time_step_rank u32              = 32
+llama_model_loader: - kv  29:                      qwen35.ssm.inner_size u32              = 4096
+llama_model_loader: - kv  30:             qwen35.full_attention_interval u32              = 4
+llama_model_loader: - kv  31:                qwen35.rope.dimension_count u32              = 64
+llama_model_loader: - kv  32:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  33:                         tokenizer.ggml.pre str              = qwen35
+llama_model_loader: - kv  34:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+llama_model_loader: - kv  35:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  36:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+llama_model_loader: - kv  37:                tokenizer.ggml.eos_token_id u32              = 248046
+llama_model_loader: - kv  38:            tokenizer.ggml.padding_token_id u32              = 248055
+llama_model_loader: - kv  39:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+llama_model_loader: - kv  40:               general.quantization_version u32              = 2
+llama_model_loader: - kv  41:                          general.file_type u32              = 7
+llama_model_loader: - kv  42:                      quantize.imatrix.file str              = Qwen3.5-9B-GGUF/imatrix_unsloth.gguf
+llama_model_loader: - kv  43:                   quantize.imatrix.dataset str              = unsloth_calibration_Qwen3.5-9B.txt
+llama_model_loader: - kv  44:             quantize.imatrix.entries_count u32              = 248
+llama_model_loader: - kv  45:              quantize.imatrix.chunks_count u32              = 80
+llama_model_loader: - type  f32:  177 tensors
+llama_model_loader: - type  f16:  117 tensors
+llama_model_loader: - type q8_0:  133 tensors
+[   1/ 427]                        output.weight - [  4096, 248320,      1,      1], type =    f16, converting to q6_K .. size =  1940.00 MiB ->   795.70 MiB
+[   2/ 427]                   output_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   3/ 427]                    token_embd.weight - [  4096, 248320,      1,      1], type =    f16, converting to q2_K .. size =  1940.00 MiB ->   318.28 MiB
+[   4/ 427]               blk.0.attn_gate.weight - [  4096,   4096,      1,      1], type =    f16, converting to q2_K .. size =    32.00 MiB ->     5.25 MiB
+[   5/ 427]               blk.0.attn_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   6/ 427]                blk.0.attn_qkv.weight - [  4096,   8192,      1,      1], type =   q8_0, llama_model_quantize: failed to quantize: requantizing from type q8_0 is disabled
+main: failed to quantize model from '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf'
+[00:04:13] Q2_K 完成 -> 1.1G
+[00:04:13] 生成 Q3_K_M ...
+main: build = 8240 (d088d5b74)
+main: built with AppleClang 17.0.0.17000404 for Darwin arm64
+main: quantizing '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf' to '/Users/alex/Documents/mlx-community/Qwen3.5-9B-quants/Qwen3.5-9B-Q3_K_M.gguf' as Q3_K_M
+llama_model_loader: loaded meta data with 46 key-value pairs and 427 tensors from /Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = qwen35
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Qwen3.5-9B
+llama_model_loader: - kv   3:                           general.basename str              = Qwen3.5-9B
+llama_model_loader: - kv   4:                       general.quantized_by str              = Unsloth
+llama_model_loader: - kv   5:                         general.size_label str              = 9B
+llama_model_loader: - kv   6:                            general.license str              = apache-2.0
+llama_model_loader: - kv   7:                       general.license.link str              = https://huggingface.co/Qwen/Qwen3.5-9...
+llama_model_loader: - kv   8:                           general.repo_url str              = https://huggingface.co/unsloth
+llama_model_loader: - kv   9:                   general.base_model.count u32              = 1
+llama_model_loader: - kv  10:                  general.base_model.0.name str              = Qwen3.5 9B
+llama_model_loader: - kv  11:          general.base_model.0.organization str              = Qwen
+llama_model_loader: - kv  12:              general.base_model.0.repo_url str              = https://huggingface.co/Qwen/Qwen3.5-9B
+llama_model_loader: - kv  13:                               general.tags arr[str,2]       = ["unsloth", "image-text-to-text"]
+llama_model_loader: - kv  14:                         qwen35.block_count u32              = 32
+llama_model_loader: - kv  15:                      qwen35.context_length u32              = 262144
+llama_model_loader: - kv  16:                    qwen35.embedding_length u32              = 4096
+llama_model_loader: - kv  17:                 qwen35.feed_forward_length u32              = 12288
+llama_model_loader: - kv  18:                qwen35.attention.head_count u32              = 16
+llama_model_loader: - kv  19:             qwen35.attention.head_count_kv u32              = 4
+llama_model_loader: - kv  20:             qwen35.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+llama_model_loader: - kv  21:                      qwen35.rope.freq_base f32              = 10000000.000000
+llama_model_loader: - kv  22:    qwen35.attention.layer_norm_rms_epsilon f32              = 0.000001
+llama_model_loader: - kv  23:                qwen35.attention.key_length u32              = 256
+llama_model_loader: - kv  24:              qwen35.attention.value_length u32              = 256
+llama_model_loader: - kv  25:                     qwen35.ssm.conv_kernel u32              = 4
+llama_model_loader: - kv  26:                      qwen35.ssm.state_size u32              = 128
+llama_model_loader: - kv  27:                     qwen35.ssm.group_count u32              = 16
+llama_model_loader: - kv  28:                  qwen35.ssm.time_step_rank u32              = 32
+llama_model_loader: - kv  29:                      qwen35.ssm.inner_size u32              = 4096
+llama_model_loader: - kv  30:             qwen35.full_attention_interval u32              = 4
+llama_model_loader: - kv  31:                qwen35.rope.dimension_count u32              = 64
+llama_model_loader: - kv  32:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  33:                         tokenizer.ggml.pre str              = qwen35
+llama_model_loader: - kv  34:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+llama_model_loader: - kv  35:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  36:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+llama_model_loader: - kv  37:                tokenizer.ggml.eos_token_id u32              = 248046
+llama_model_loader: - kv  38:            tokenizer.ggml.padding_token_id u32              = 248055
+llama_model_loader: - kv  39:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+llama_model_loader: - kv  40:               general.quantization_version u32              = 2
+llama_model_loader: - kv  41:                          general.file_type u32              = 7
+llama_model_loader: - kv  42:                      quantize.imatrix.file str              = Qwen3.5-9B-GGUF/imatrix_unsloth.gguf
+llama_model_loader: - kv  43:                   quantize.imatrix.dataset str              = unsloth_calibration_Qwen3.5-9B.txt
+llama_model_loader: - kv  44:             quantize.imatrix.entries_count u32              = 248
+llama_model_loader: - kv  45:              quantize.imatrix.chunks_count u32              = 80
+llama_model_loader: - type  f32:  177 tensors
+llama_model_loader: - type  f16:  117 tensors
+llama_model_loader: - type q8_0:  133 tensors
+[   1/ 427]                        output.weight - [  4096, 248320,      1,      1], type =    f16, converting to q6_K .. size =  1940.00 MiB ->   795.70 MiB
+[   2/ 427]                   output_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   3/ 427]                    token_embd.weight - [  4096, 248320,      1,      1], type =    f16, converting to q3_K .. size =  1940.00 MiB ->   416.80 MiB
+[   4/ 427]               blk.0.attn_gate.weight - [  4096,   4096,      1,      1], type =    f16, converting to q3_K .. size =    32.00 MiB ->     6.88 MiB
+[   5/ 427]               blk.0.attn_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   6/ 427]                blk.0.attn_qkv.weight - [  4096,   8192,      1,      1], type =   q8_0, llama_model_quantize: failed to quantize: requantizing from type q8_0 is disabled
+main: failed to quantize model from '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf'
+[00:04:17] Q3_K_M 完成 -> 1.2G
+[00:04:17] 生成 Q4_K_M ...
+main: build = 8240 (d088d5b74)
+main: built with AppleClang 17.0.0.17000404 for Darwin arm64
+main: quantizing '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf' to '/Users/alex/Documents/mlx-community/Qwen3.5-9B-quants/Qwen3.5-9B-Q4_K_M.gguf' as Q4_K_M
+llama_model_loader: loaded meta data with 46 key-value pairs and 427 tensors from /Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = qwen35
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Qwen3.5-9B
+llama_model_loader: - kv   3:                           general.basename str              = Qwen3.5-9B
+llama_model_loader: - kv   4:                       general.quantized_by str              = Unsloth
+llama_model_loader: - kv   5:                         general.size_label str              = 9B
+llama_model_loader: - kv   6:                            general.license str              = apache-2.0
+llama_model_loader: - kv   7:                       general.license.link str              = https://huggingface.co/Qwen/Qwen3.5-9...
+llama_model_loader: - kv   8:                           general.repo_url str              = https://huggingface.co/unsloth
+llama_model_loader: - kv   9:                   general.base_model.count u32              = 1
+llama_model_loader: - kv  10:                  general.base_model.0.name str              = Qwen3.5 9B
+llama_model_loader: - kv  11:          general.base_model.0.organization str              = Qwen
+llama_model_loader: - kv  12:              general.base_model.0.repo_url str              = https://huggingface.co/Qwen/Qwen3.5-9B
+llama_model_loader: - kv  13:                               general.tags arr[str,2]       = ["unsloth", "image-text-to-text"]
+llama_model_loader: - kv  14:                         qwen35.block_count u32              = 32
+llama_model_loader: - kv  15:                      qwen35.context_length u32              = 262144
+llama_model_loader: - kv  16:                    qwen35.embedding_length u32              = 4096
+llama_model_loader: - kv  17:                 qwen35.feed_forward_length u32              = 12288
+llama_model_loader: - kv  18:                qwen35.attention.head_count u32              = 16
+llama_model_loader: - kv  19:             qwen35.attention.head_count_kv u32              = 4
+llama_model_loader: - kv  20:             qwen35.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+llama_model_loader: - kv  21:                      qwen35.rope.freq_base f32              = 10000000.000000
+llama_model_loader: - kv  22:    qwen35.attention.layer_norm_rms_epsilon f32              = 0.000001
+llama_model_loader: - kv  23:                qwen35.attention.key_length u32              = 256
+llama_model_loader: - kv  24:              qwen35.attention.value_length u32              = 256
+llama_model_loader: - kv  25:                     qwen35.ssm.conv_kernel u32              = 4
+llama_model_loader: - kv  26:                      qwen35.ssm.state_size u32              = 128
+llama_model_loader: - kv  27:                     qwen35.ssm.group_count u32              = 16
+llama_model_loader: - kv  28:                  qwen35.ssm.time_step_rank u32              = 32
+llama_model_loader: - kv  29:                      qwen35.ssm.inner_size u32              = 4096
+llama_model_loader: - kv  30:             qwen35.full_attention_interval u32              = 4
+llama_model_loader: - kv  31:                qwen35.rope.dimension_count u32              = 64
+llama_model_loader: - kv  32:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  33:                         tokenizer.ggml.pre str              = qwen35
+llama_model_loader: - kv  34:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+llama_model_loader: - kv  35:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  36:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+llama_model_loader: - kv  37:                tokenizer.ggml.eos_token_id u32              = 248046
+llama_model_loader: - kv  38:            tokenizer.ggml.padding_token_id u32              = 248055
+llama_model_loader: - kv  39:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+llama_model_loader: - kv  40:               general.quantization_version u32              = 2
+llama_model_loader: - kv  41:                          general.file_type u32              = 7
+llama_model_loader: - kv  42:                      quantize.imatrix.file str              = Qwen3.5-9B-GGUF/imatrix_unsloth.gguf
+llama_model_loader: - kv  43:                   quantize.imatrix.dataset str              = unsloth_calibration_Qwen3.5-9B.txt
+llama_model_loader: - kv  44:             quantize.imatrix.entries_count u32              = 248
+llama_model_loader: - kv  45:              quantize.imatrix.chunks_count u32              = 80
+llama_model_loader: - type  f32:  177 tensors
+llama_model_loader: - type  f16:  117 tensors
+llama_model_loader: - type q8_0:  133 tensors
+[   1/ 427]                        output.weight - [  4096, 248320,      1,      1], type =    f16, converting to q6_K .. size =  1940.00 MiB ->   795.70 MiB
+[   2/ 427]                   output_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   3/ 427]                    token_embd.weight - [  4096, 248320,      1,      1], type =    f16, converting to q4_K .. size =  1940.00 MiB ->   545.62 MiB
+[   4/ 427]               blk.0.attn_gate.weight - [  4096,   4096,      1,      1], type =    f16, converting to q4_K .. size =    32.00 MiB ->     9.00 MiB
+[   5/ 427]               blk.0.attn_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   6/ 427]                blk.0.attn_qkv.weight - [  4096,   8192,      1,      1], type =   q8_0, llama_model_quantize: failed to quantize: requantizing from type q8_0 is disabled
+main: failed to quantize model from '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf'
+[00:04:23] Q4_K_M 完成 -> 1.3G
+[00:04:23] 生成 Q5_K_M ...
+main: build = 8240 (d088d5b74)
+main: built with AppleClang 17.0.0.17000404 for Darwin arm64
+main: quantizing '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf' to '/Users/alex/Documents/mlx-community/Qwen3.5-9B-quants/Qwen3.5-9B-Q5_K_M.gguf' as Q5_K_M
+llama_model_loader: loaded meta data with 46 key-value pairs and 427 tensors from /Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = qwen35
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Qwen3.5-9B
+llama_model_loader: - kv   3:                           general.basename str              = Qwen3.5-9B
+llama_model_loader: - kv   4:                       general.quantized_by str              = Unsloth
+llama_model_loader: - kv   5:                         general.size_label str              = 9B
+llama_model_loader: - kv   6:                            general.license str              = apache-2.0
+llama_model_loader: - kv   7:                       general.license.link str              = https://huggingface.co/Qwen/Qwen3.5-9...
+llama_model_loader: - kv   8:                           general.repo_url str              = https://huggingface.co/unsloth
+llama_model_loader: - kv   9:                   general.base_model.count u32              = 1
+llama_model_loader: - kv  10:                  general.base_model.0.name str              = Qwen3.5 9B
+llama_model_loader: - kv  11:          general.base_model.0.organization str              = Qwen
+llama_model_loader: - kv  12:              general.base_model.0.repo_url str              = https://huggingface.co/Qwen/Qwen3.5-9B
+llama_model_loader: - kv  13:                               general.tags arr[str,2]       = ["unsloth", "image-text-to-text"]
+llama_model_loader: - kv  14:                         qwen35.block_count u32              = 32
+llama_model_loader: - kv  15:                      qwen35.context_length u32              = 262144
+llama_model_loader: - kv  16:                    qwen35.embedding_length u32              = 4096
+llama_model_loader: - kv  17:                 qwen35.feed_forward_length u32              = 12288
+llama_model_loader: - kv  18:                qwen35.attention.head_count u32              = 16
+llama_model_loader: - kv  19:             qwen35.attention.head_count_kv u32              = 4
+llama_model_loader: - kv  20:             qwen35.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+llama_model_loader: - kv  21:                      qwen35.rope.freq_base f32              = 10000000.000000
+llama_model_loader: - kv  22:    qwen35.attention.layer_norm_rms_epsilon f32              = 0.000001
+llama_model_loader: - kv  23:                qwen35.attention.key_length u32              = 256
+llama_model_loader: - kv  24:              qwen35.attention.value_length u32              = 256
+llama_model_loader: - kv  25:                     qwen35.ssm.conv_kernel u32              = 4
+llama_model_loader: - kv  26:                      qwen35.ssm.state_size u32              = 128
+llama_model_loader: - kv  27:                     qwen35.ssm.group_count u32              = 16
+llama_model_loader: - kv  28:                  qwen35.ssm.time_step_rank u32              = 32
+llama_model_loader: - kv  29:                      qwen35.ssm.inner_size u32              = 4096
+llama_model_loader: - kv  30:             qwen35.full_attention_interval u32              = 4
+llama_model_loader: - kv  31:                qwen35.rope.dimension_count u32              = 64
+llama_model_loader: - kv  32:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  33:                         tokenizer.ggml.pre str              = qwen35
+llama_model_loader: - kv  34:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+llama_model_loader: - kv  35:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  36:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+llama_model_loader: - kv  37:                tokenizer.ggml.eos_token_id u32              = 248046
+llama_model_loader: - kv  38:            tokenizer.ggml.padding_token_id u32              = 248055
+llama_model_loader: - kv  39:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+llama_model_loader: - kv  40:               general.quantization_version u32              = 2
+llama_model_loader: - kv  41:                          general.file_type u32              = 7
+llama_model_loader: - kv  42:                      quantize.imatrix.file str              = Qwen3.5-9B-GGUF/imatrix_unsloth.gguf
+llama_model_loader: - kv  43:                   quantize.imatrix.dataset str              = unsloth_calibration_Qwen3.5-9B.txt
+llama_model_loader: - kv  44:             quantize.imatrix.entries_count u32              = 248
+llama_model_loader: - kv  45:              quantize.imatrix.chunks_count u32              = 80
+llama_model_loader: - type  f32:  177 tensors
+llama_model_loader: - type  f16:  117 tensors
+llama_model_loader: - type q8_0:  133 tensors
+[   1/ 427]                        output.weight - [  4096, 248320,      1,      1], type =    f16, converting to q6_K .. size =  1940.00 MiB ->   795.70 MiB
+[   2/ 427]                   output_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   3/ 427]                    token_embd.weight - [  4096, 248320,      1,      1], type =    f16, converting to q5_K .. size =  1940.00 MiB ->   666.88 MiB
+[   4/ 427]               blk.0.attn_gate.weight - [  4096,   4096,      1,      1], type =    f16, converting to q5_K .. size =    32.00 MiB ->    11.00 MiB
+[   5/ 427]               blk.0.attn_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   6/ 427]                blk.0.attn_qkv.weight - [  4096,   8192,      1,      1], type =   q8_0, llama_model_quantize: failed to quantize: requantizing from type q8_0 is disabled
+main: failed to quantize model from '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf'
+[00:04:28] Q5_K_M 完成 -> 1.5G
+[00:04:28] 生成 Q6_K ...
+main: build = 8240 (d088d5b74)
+main: built with AppleClang 17.0.0.17000404 for Darwin arm64
+main: quantizing '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf' to '/Users/alex/Documents/mlx-community/Qwen3.5-9B-quants/Qwen3.5-9B-Q6_K.gguf' as Q6_K
+llama_model_loader: loaded meta data with 46 key-value pairs and 427 tensors from /Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf (version GGUF V3 (latest))
+llama_model_loader: Dumping metadata keys/values. Note: KV overrides do not apply in this output.
+llama_model_loader: - kv   0:                       general.architecture str              = qwen35
+llama_model_loader: - kv   1:                               general.type str              = model
+llama_model_loader: - kv   2:                               general.name str              = Qwen3.5-9B
+llama_model_loader: - kv   3:                           general.basename str              = Qwen3.5-9B
+llama_model_loader: - kv   4:                       general.quantized_by str              = Unsloth
+llama_model_loader: - kv   5:                         general.size_label str              = 9B
+llama_model_loader: - kv   6:                            general.license str              = apache-2.0
+llama_model_loader: - kv   7:                       general.license.link str              = https://huggingface.co/Qwen/Qwen3.5-9...
+llama_model_loader: - kv   8:                           general.repo_url str              = https://huggingface.co/unsloth
+llama_model_loader: - kv   9:                   general.base_model.count u32              = 1
+llama_model_loader: - kv  10:                  general.base_model.0.name str              = Qwen3.5 9B
+llama_model_loader: - kv  11:          general.base_model.0.organization str              = Qwen
+llama_model_loader: - kv  12:              general.base_model.0.repo_url str              = https://huggingface.co/Qwen/Qwen3.5-9B
+llama_model_loader: - kv  13:                               general.tags arr[str,2]       = ["unsloth", "image-text-to-text"]
+llama_model_loader: - kv  14:                         qwen35.block_count u32              = 32
+llama_model_loader: - kv  15:                      qwen35.context_length u32              = 262144
+llama_model_loader: - kv  16:                    qwen35.embedding_length u32              = 4096
+llama_model_loader: - kv  17:                 qwen35.feed_forward_length u32              = 12288
+llama_model_loader: - kv  18:                qwen35.attention.head_count u32              = 16
+llama_model_loader: - kv  19:             qwen35.attention.head_count_kv u32              = 4
+llama_model_loader: - kv  20:             qwen35.rope.dimension_sections arr[i32,4]       = [11, 11, 10, 0]
+llama_model_loader: - kv  21:                      qwen35.rope.freq_base f32              = 10000000.000000
+llama_model_loader: - kv  22:    qwen35.attention.layer_norm_rms_epsilon f32              = 0.000001
+llama_model_loader: - kv  23:                qwen35.attention.key_length u32              = 256
+llama_model_loader: - kv  24:              qwen35.attention.value_length u32              = 256
+llama_model_loader: - kv  25:                     qwen35.ssm.conv_kernel u32              = 4
+llama_model_loader: - kv  26:                      qwen35.ssm.state_size u32              = 128
+llama_model_loader: - kv  27:                     qwen35.ssm.group_count u32              = 16
+llama_model_loader: - kv  28:                  qwen35.ssm.time_step_rank u32              = 32
+llama_model_loader: - kv  29:                      qwen35.ssm.inner_size u32              = 4096
+llama_model_loader: - kv  30:             qwen35.full_attention_interval u32              = 4
+llama_model_loader: - kv  31:                qwen35.rope.dimension_count u32              = 64
+llama_model_loader: - kv  32:                       tokenizer.ggml.model str              = gpt2
+llama_model_loader: - kv  33:                         tokenizer.ggml.pre str              = qwen35
+llama_model_loader: - kv  34:                      tokenizer.ggml.tokens arr[str,248320]  = ["!", "\"", "#", "$", "%", "&", "'", ...
+llama_model_loader: - kv  35:                  tokenizer.ggml.token_type arr[i32,248320]  = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
+llama_model_loader: - kv  36:                      tokenizer.ggml.merges arr[str,247587]  = ["Ġ Ġ", "ĠĠ ĠĠ", "i n", "Ġ t",...
+llama_model_loader: - kv  37:                tokenizer.ggml.eos_token_id u32              = 248046
+llama_model_loader: - kv  38:            tokenizer.ggml.padding_token_id u32              = 248055
+llama_model_loader: - kv  39:                    tokenizer.chat_template str              = {%- set image_count = namespace(value...
+llama_model_loader: - kv  40:               general.quantization_version u32              = 2
+llama_model_loader: - kv  41:                          general.file_type u32              = 7
+llama_model_loader: - kv  42:                      quantize.imatrix.file str              = Qwen3.5-9B-GGUF/imatrix_unsloth.gguf
+llama_model_loader: - kv  43:                   quantize.imatrix.dataset str              = unsloth_calibration_Qwen3.5-9B.txt
+llama_model_loader: - kv  44:             quantize.imatrix.entries_count u32              = 248
+llama_model_loader: - kv  45:              quantize.imatrix.chunks_count u32              = 80
+llama_model_loader: - type  f32:  177 tensors
+llama_model_loader: - type  f16:  117 tensors
+llama_model_loader: - type q8_0:  133 tensors
+[   1/ 427]                        output.weight - [  4096, 248320,      1,      1], type =    f16, converting to q6_K .. size =  1940.00 MiB ->   795.70 MiB
+[   2/ 427]                   output_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   3/ 427]                    token_embd.weight - [  4096, 248320,      1,      1], type =    f16, converting to q6_K .. size =  1940.00 MiB ->   795.70 MiB
+[   4/ 427]               blk.0.attn_gate.weight - [  4096,   4096,      1,      1], type =    f16, converting to q6_K .. size =    32.00 MiB ->    13.12 MiB
+[   5/ 427]               blk.0.attn_norm.weight - [  4096,      1,      1,      1], type =    f32, size =    0.016 MiB
+[   6/ 427]                blk.0.attn_qkv.weight - [  4096,   8192,      1,      1], type =   q8_0, llama_model_quantize: failed to quantize: requantizing from type q8_0 is disabled
+main: failed to quantize model from '/Users/alex/Documents/mlx-community/Qwen3.5-9B-UD-Q8_K_XL/Qwen3.5-9B-UD-Q8_K_XL.gguf'
+[00:04:33] Q6_K 完成 -> 1.6G
+
+=== [Phase 1-B] llama-bench 基准测试 (M2 Ultra 113) ===
+[00:04:33] Bench Q8_K_XL ( 12G)...
+[00:04:48] Q8_K_XL: 完成
+[00:04:48] Bench Q2_K (1.1G)...
+[00:04:48] Q2_K: 完成
+[00:04:48] Bench Q3_K_M (1.2G)...
+[00:04:49] Q3_K_M: 完成
+[00:04:49] Bench Q4_K_M (1.3G)...
+[00:04:49] Q4_K_M: 完成
+[00:04:49] Bench Q5_K_M (1.5G)...
+[00:04:50] Q5_K_M: 完成
+[00:04:50] Bench Q6_K (1.6G)...
+[00:04:51] Q6_K: 完成
+[00:04:51] Bench 0.8B_Q8 (1.1G)...
+[00:04:55] 0.8B_Q8: 完成
+[00:04:55] Bench 2B_Q8 (2.6G)...
+[00:05:00] 2B_Q8: 完成
+
+=== Phase 1-B 完成 ===
+CSV 结果: /Users/alex/Documents/Codes/FreeExplore/data/phase1_bench_113_m2ultra.csv
+
+machine,quant_label,n_prompt,n_gen,avg_tps,stddev_tps,model_size_bytes
+M2Ultra_192GB,Q8_K_XL,"0","512","439157972","93219",12974040288
+M2Ultra_192GB,Q8_K_XL,"0","0","3016577444","2103900",12974040288
+M2Ultra_192GB,0.8B_Q8,"0","512","68981486","160671",1186443520
+M2Ultra_192GB,0.8B_Q8,"0","0","911634138","576683",1186443520
+M2Ultra_192GB,2B_Q8,"0","512","114383736","383177",2834940160
+M2Ultra_192GB,2B_Q8,"0","0","1154123680","434030",2834940160

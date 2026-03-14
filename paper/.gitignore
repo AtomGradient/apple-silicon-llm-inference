@@ -1,0 +1,20 @@
+# Model files
+*.gguf
+*.mlpackage/
+models/
+
+# LaTeX intermediates (tectonic keeps-intermediates)
+*.aux
+*.toc
+*.log
+*.out
+*.blg
+*.bbl
+
+# Python
+__pycache__/
+*.pyc
+.DS_Store
+
+# Raw benchmark output (large)
+data/raw/

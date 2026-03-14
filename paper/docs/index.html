@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Silicon LLM Inference: Quantization, Speculative Decoding & Cross-Device Benchmarks | AtomGradient</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #21262d;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --accent2: #f78166;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --red: #f85149;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* --- Nav --- */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(13,17,23,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand { font-weight: 700; font-size: 0.95rem; color: var(--text); }
+    .nav-brand span { color: var(--accent); }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a { color: var(--muted); text-decoration: none; font-size: 0.9rem; transition: color .2s; }
+    .nav-links a:hover { color: var(--text); }
+    .lang-btn {
+      padding: 0.25rem 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      background: transparent;
+      color: var(--muted);
+      transition: all .2s;
+    }
+    .lang-btn.active { border-color: var(--accent); color: var(--accent); }
+
+    /* --- Bilingual --- */
+    .z { display: none; }
+    html[lang="zh"] .e { display: none; }
+    html[lang="zh"] .z { display: initial; }
+
+    /* --- Layout --- */
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 2rem; }
+
+    /* --- Hero --- */
+    .hero {
+      padding: 5rem 2rem 3rem;
+      text-align: center;
+      background: radial-gradient(ellipse at 50% 0%, #1c2a3a 0%, transparent 70%);
+    }
+    .hero-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.25;
+      max-width: 760px;
+      margin: 0 auto 1.2rem;
+    }
+    .hero h1 .hi { color: var(--accent); }
+    .hero .subtitle {
+      color: var(--muted);
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+      font-size: 1.05rem;
+    }
+    .stat-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      max-width: 860px;
+      margin: 0 auto 2rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.2rem;
+      text-align: left;
+    }
+    .stat-card .val {
+      font-size: 2rem; font-weight: 800;
+      color: var(--accent); line-height: 1;
+    }
+    .stat-card .unit { font-size: 1rem; color: var(--muted); }
+    .stat-card .label { font-size: 0.82rem; color: var(--muted); margin-top: 0.4rem; }
+    .btn-group { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      padding: 0.65rem 1.5rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all .2s;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* --- Section --- */
+    section { padding: 3.5rem 0; }
+    section:not(:last-child) { border-bottom: 1px solid var(--border); }
+    h2.section-title {
+      font-size: 1.5rem; font-weight: 700;
+      margin-bottom: 0.4rem; color: var(--text);
+    }
+    .section-sub { color: var(--muted); margin-bottom: 2rem; font-size: 0.9rem; }
+
+    /* --- Finding cards --- */
+    .findings-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.2rem;
+    }
+    .finding-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.4rem;
+    }
+    .finding-card .icon { font-size: 1.5rem; margin-bottom: 0.7rem; }
+    .finding-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .finding-card p { font-size: 0.875rem; color: var(--muted); }
+    .finding-card .highlight { color: var(--accent2); font-weight: 700; }
+
+    /* --- Tables --- */
+    .table-wrap { overflow-x: auto; margin: 1.5rem 0; border-radius: 10px; border: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+    thead { background: var(--surface2); }
+    th { padding: 0.75rem 1rem; text-align: left; font-weight: 600; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: .05em; }
+    td { padding: 0.65rem 1rem; border-top: 1px solid var(--border); color: var(--text); }
+    tr:hover td { background: var(--surface2); }
+    .good { color: var(--green); font-weight: 700; }
+    .warn { color: var(--yellow); font-weight: 700; }
+    .bad  { color: var(--red);   font-weight: 700; }
+    .best-row td { background: rgba(88,166,255,0.06); }
+
+    /* --- Architecture diagram --- */
+    .arch-flow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+    @media (max-width: 640px) { .arch-flow { grid-template-columns: 1fr; } }
+    .flow-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+    }
+    .flow-box h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent); }
+    .flow-step {
+      display: flex; align-items: flex-start; gap: 0.75rem;
+      padding: 0.6rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .flow-step:last-child { border-bottom: none; }
+    .flow-num {
+      min-width: 1.5rem; height: 1.5rem;
+      background: var(--surface2);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 700; color: var(--accent);
+    }
+    .flow-text { font-size: 0.875rem; color: var(--muted); }
+    .flow-text strong { color: var(--text); }
+
+    /* --- Hardware comparison --- */
+    .hw-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .hw-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.4rem;
+    }
+    .hw-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+    .hw-spec { display: flex; justify-content: space-between; padding: 0.35rem 0; border-bottom: 1px solid var(--border); font-size: 0.875rem; }
+    .hw-spec:last-child { border-bottom: none; }
+    .hw-spec .k { color: var(--muted); }
+    .hw-spec .v { font-weight: 600; }
+
+    /* --- Footer --- */
+    footer {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 2rem;
+      text-align: center;
+    }
+    footer p { color: var(--muted); font-size: 0.875rem; margin-bottom: 0.6rem; }
+    footer a { color: var(--accent); text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+    .wip-notice { color: var(--accent2); font-size: 0.8rem; margin-top: 0.8rem; }
+    .citation-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.2rem;
+      text-align: left;
+      max-width: 700px;
+      margin: 1.5rem auto 0;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== NAV ==================== -->
+<nav>
+  <div class="nav-brand">AtomGradient &middot; <span>Apple Silicon LLM Inference</span></div>
+  <div class="nav-links">
+    <a href="#findings"><span class="e">Findings</span><span class="z">发现</span></a>
+    <a href="#results"><span class="e">Results</span><span class="z">结果</span></a>
+    <a href="#architecture"><span class="e">Methods</span><span class="z">方法</span></a>
+    <a href="#hardware"><span class="e">Hardware</span><span class="z">硬件</span></a>
+    <button class="lang-btn active" id="btnEN" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btnZH" onclick="setLang('zh')">中文</button>
+  </div>
+</nav>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <div class="hero-badge">
+    <span class="e">&#128203; March 2026 &middot; M2 Ultra · M1 Max · M2 Pro &middot; llama.cpp + MLX</span>
+    <span class="z">&#128203; 2026年3月 &middot; M2 Ultra · M1 Max · M2 Pro &middot; llama.cpp + MLX</span>
+  </div>
+  <h1>
+    <span class="e">Apple Silicon <span class="hi">LLM Inference</span><br>Quantization, Speculative Decoding &amp; Cross-Device Benchmarks</span>
+    <span class="z">Apple Silicon <span class="hi">LLM 推理</span>：量化、推测采样与跨设备基准</span>
+  </h1>
+  <p class="subtitle">
+    <span class="e">From quantization ladders to speculative decoding: a systematic empirical study across three Apple Silicon machines.</span>
+    <span class="z">从量化梯度到推测采样：覆盖三台 Apple Silicon 设备的系统性实验研究。</span>
+  </p>
+  <div class="stat-cards">
+    <div class="stat-card">
+      <div class="val">+25.7<span class="unit">%</span></div>
+      <div class="label">
+        <span class="e">Speculative Decoding speedup (0.8B→9B)</span>
+        <span class="z">推测采样提速（0.8B→9B）</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="val">0.18<span class="unit">%</span></div>
+      <div class="label">
+        <span class="e">PPL degradation at Q8_0 (near-lossless)</span>
+        <span class="z">Q8_0 困惑度损失（近乎无损）</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="val">2.5<span class="unit">×</span></div>
+      <div class="label">
+        <span class="e">Min draft/target speed ratio for SD benefit</span>
+        <span class="z">SD 获益所需最低速比</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="val">~79<span class="unit">%</span></div>
+      <div class="label">
+        <span class="e">GGML_RPC cross-device SD overhead (RPC protocol, not network)</span>
+        <span class="z">GGML_RPC 跨设备 SD 开销（协议开销，非网络瓶颈）</span>
+      </div>
+    </div>
+  </div>
+  <div class="btn-group">
+    <a href="paper.pdf" class="btn btn-primary">
+      <span class="e">&#8595; Download Paper (PDF)</span>
+      <span class="z">&#8595; 下载论文 (PDF)</span>
+    </a>
+    <a href="https://github.com/AtomGradient/apple-silicon-llm-inference" class="btn btn-secondary">GitHub</a>
+  </div>
+</div>
+
+<!-- ==================== KEY FINDINGS ==================== -->
+<section id="findings">
+  <div class="container">
+    <h2 class="section-title">
+      <span class="e">Key Findings</span>
+      <span class="z">核心发现</span>
+    </h2>
+    <p class="section-sub">
+      <span class="e">Six results from systematic benchmarking across three Apple Silicon machines.</span>
+      <span class="z">覆盖三台 Apple Silicon 设备的系统性基准测试揭示的六项关键发现。</span>
+    </p>
+    <div class="findings-grid">
+      <div class="finding-card">
+        <div class="icon">&#9889;</div>
+        <h3>
+          <span class="e">Speed Ratio &gt; Acceptance Rate</span>
+          <span class="z">速比比接受率更重要</span>
+        </h3>
+        <p>
+          <span class="e">On Apple Silicon, SD benefit is governed by draft/target speed ratio. A <span class="highlight">3.3× ratio</span> yields +25.7% speedup even at <span class="highlight">2–4% acceptance rate</span>, due to Metal GPU batch-verification efficiency.</span>
+          <span class="z">在 Apple Silicon 上，推测采样（SD）的收益由 draft/target 速比决定。<span class="highlight">3.3× 速比</span>在仅 <span class="highlight">2–4% 接受率</span>下仍能实现 +25.7% 提速，得益于 Metal GPU 批处理验证效率。</span>
+        </p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">&#128200;</div>
+        <h3>
+          <span class="e">Q6_K is Pareto-Optimal</span>
+          <span class="z">Q6_K 是 Pareto 最优点</span>
+        </h3>
+        <p>
+          <span class="e">Q8_0 is near-lossless (0.18% PPL). Q6_K dominates Q5_K_M on both speed and quality. Q4_K_M is the memory-constrained sweet spot. <span class="highlight">Sub-4-bit is unusable</span> (Q2_K: +267% PPL).</span>
+          <span class="z">Q8_0 近乎无损（0.18% PPL 损失）。Q6_K 在速度和质量上均优于 Q5_K_M。Q4_K_M 是内存受限场景的推荐选择。<span class="highlight">4bit 以下实际不可用</span>（Q2_K：+267% PPL）。</span>
+        </p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">&#10060;</div>
+        <h3>
+          <span class="e">Self-Speculation Fails</span>
+          <span class="z">自推测采样不可行</span>
+        </h3>
+        <p>
+          <span class="e">Same-model-different-quant SD (4B Q2→Q8) achieves only <span class="highlight">1.35× speed ratio</span>, causing ~25% throughput <em>loss</em>. Requires ≥2.5× to break even on unified memory.</span>
+          <span class="z">同模型不同量化的 SD（4B Q2→Q8）速比仅 <span class="highlight">1.35×</span>，导致约 25% 吞吐量<em>下降</em>。统一内存架构下需 ≥2.5× 速比才能收支平衡。</span>
+        </p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">&#127381;</div>
+        <h3>
+          <span class="e">MoE + SD Conflict</span>
+          <span class="z">MoE 与 SD 存在冲突</span>
+        </h3>
+        <p>
+          <span class="e">Qwen3.5-35B-A3B MoE achieves 55.2 tok/s (only ~3B active params). Its sparse expert routing makes draft predictions unreliable; <span class="highlight">SD offers no benefit</span>.</span>
+          <span class="z">Qwen3.5-35B-A3B MoE 达到 55.2 tok/s（每 token 仅激活 ~3B 参数）。稀疏 expert routing 使 draft 预测不可靠；<span class="highlight">SD 无益</span>。</span>
+        </p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">&#128190;</div>
+        <h3>
+          <span class="e">QAT Shows Smooth Gradients</span>
+          <span class="z">QAT 呈现平滑梯度</span>
+        </h3>
+        <p>
+          <span class="e">Gemma-3-4B QAT spans 96→137 tok/s (3→8 bit) with <span class="highlight">σ &lt; 0.3 tok/s</span>. PTQ Qwen3-8B shows σ≈19 tok/s variance at low bit-widths.</span>
+          <span class="z">Gemma-3-4B QAT 从 8bit 到 3bit 吞吐从 96→137 tok/s，<span class="highlight">σ &lt; 0.3 tok/s</span>。PTQ Qwen3-8B 低精度下 σ≈19 tok/s 方差较大。</span>
+        </p>
+      </div>
+      <div class="finding-card">
+        <div class="icon">&#9888;</div>
+        <h3>
+          <span class="e">Cross-Device SD: GGML_RPC Not Viable</span>
+          <span class="z">跨设备 SD：GGML_RPC 不可用于生产</span>
+        </h3>
+        <p>
+          <span class="e">GGML_RPC cross-device SD incurs <span class="highlight">~79–83% throughput reduction</span> from per-op RPC protocol overhead (~51–57 ms/token), not network bandwidth. Initial BLAS-build results (−2%) were invalid due to silent local fallback. Purpose-built streaming protocol needed.</span>
+          <span class="z">GGML_RPC 跨设备 SD 因逐 op RPC 协议开销（约 51–57 ms/token）导致 <span class="highlight">~79–83% 吞吐下降</span>，而非网络带宽瓶颈。最初的 BLAS 版结果（−2%）因本地静默回退而无效。需要专用流式协议。</span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== RESULTS ==================== -->
+<section id="results">
+  <div class="container">
+    <h2 class="section-title">
+      <span class="e">Benchmark Results</span>
+      <span class="z">基准测试结果</span>
+    </h2>
+    <p class="section-sub">
+      <span class="e">Primary experiments on M2 Ultra 192 GB; hardware comparison across M2 Ultra, M1 Max, and M2 Pro.</span>
+      <span class="z">主要实验在 M2 Ultra 192 GB 上运行；硬件对比覆盖 M2 Ultra、M1 Max 和 M2 Pro 三台机器。</span>
+    </p>
+
+    <!-- Quantization TG Table -->
+    <h3 style="margin-bottom:0.5rem;font-size:1rem;">
+      <span class="e">Qwen3.5-4B: Quantization Throughput &amp; Quality</span>
+      <span class="z">Qwen3.5-4B：量化精度吞吐量与质量</span>
+    </h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><span class="e">Quant</span><span class="z">精度</span></th>
+            <th><span class="e">TG (tok/s)</span><span class="z">TG (tok/s)</span></th>
+            <th><span class="e">PP (tok/s)</span><span class="z">PP (tok/s)</span></th>
+            <th><span class="e">Size (GB)</span><span class="z">大小 (GB)</span></th>
+            <th><span class="e">TG Speedup</span><span class="z">TG 加速</span></th>
+            <th><span class="e">PPL</span><span class="z">困惑度</span></th>
+            <th><span class="e">ΔPPL%</span><span class="z">ΔPPL%</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>F16</td><td>36.8</td><td>1931.6</td><td>8.42</td><td>1.00×</td><td>11.055</td><td>—</td></tr>
+          <tr><td>Q8_0</td><td>54.0</td><td>1373.6</td><td>4.48</td><td class="good">1.47×</td><td>11.075</td><td class="good">0.18%</td></tr>
+          <tr class="best-row"><td><strong>Q6_K ★</strong></td><td><strong>62.0</strong></td><td>1358.9</td><td>3.46</td><td class="good">1.68×</td><td>11.115</td><td class="good">0.54%</td></tr>
+          <tr><td>Q5_K_M</td><td>56.6</td><td>1276.1</td><td>3.11</td><td>1.54×</td><td>11.248</td><td class="warn">1.74%</td></tr>
+          <tr><td>Q4_K_M</td><td>58.5</td><td>1337.6</td><td>2.71</td><td>1.59×</td><td>11.504</td><td class="warn">4.07%</td></tr>
+          <tr><td>Q3_K_M</td><td>68.8</td><td>1611.9</td><td>2.26</td><td>1.87×</td><td>12.668</td><td class="bad">14.6%</td></tr>
+          <tr><td>Q2_K</td><td>72.8</td><td>1700.9</td><td>1.80</td><td>1.98×</td><td>40.602</td><td class="bad">267%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Speculative Decoding Table -->
+    <h3 style="margin:2rem 0 0.5rem;font-size:1rem;">
+      <span class="e">Speculative Decoding: 9B Q8 Target (baseline 42.4 tok/s)</span>
+      <span class="z">推测采样：9B Q8 目标模型（基线 42.4 tok/s）</span>
+    </h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><span class="e">Draft Model</span><span class="z">Draft 模型</span></th>
+            <th>k</th>
+            <th><span class="e">Speed Ratio</span><span class="z">速比</span></th>
+            <th><span class="e">Avg Accept%</span><span class="z">平均接受率</span></th>
+            <th><span class="e">Avg TPS</span><span class="z">平均 TPS</span></th>
+            <th><span class="e">vs Baseline</span><span class="z">相对基线</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="best-row">
+            <td><strong>0.8B Q8 ★</strong></td><td>4</td><td>3.31×</td><td>3.3%</td>
+            <td><strong>53.3</strong></td><td class="good">+25.7%</td>
+          </tr>
+          <tr>
+            <td>0.8B Q8</td><td>8</td><td>3.31×</td><td>1.3%</td>
+            <td>52.7</td><td class="good">+24.3%</td>
+          </tr>
+          <tr>
+            <td>2B Q8</td><td>4</td><td>2.61×</td><td>3.4%</td>
+            <td>48.5</td><td class="warn">+14.3%</td>
+          </tr>
+          <tr>
+            <td>2B Q8</td><td>8</td><td>2.61×</td><td>1.4%</td>
+            <td>47.8</td><td class="warn">+12.7%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Cross-device SD Table -->
+    <h3 style="margin:2rem 0 0.5rem;font-size:1rem;">
+      <span class="e">Cross-Device SD via GGML_RPC (9B Q8 target on M2 Ultra, 0.8B Q8 draft, k=4, no-BLAS build)</span>
+      <span class="z">GGML_RPC 跨设备 SD（M2 Ultra 运行 9B Q8 目标模型，0.8B Q8 草稿模型，k=4，无 BLAS 编译）</span>
+    </h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><span class="e">Draft Backend</span><span class="z">Draft 后端</span></th>
+            <th><span class="e">Avg TPS</span><span class="z">平均 TPS</span></th>
+            <th><span class="e">vs Local</span><span class="z">相对本地</span></th>
+            <th><span class="e">Draft tok/s via RPC</span><span class="z">Draft RPC 速度</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="best-row">
+            <td><strong>Local (M2 Ultra)</strong></td>
+            <td><strong>53.8</strong></td>
+            <td class="good">baseline</td>
+            <td>140.2 (local)</td>
+          </tr>
+          <tr>
+            <td>M1 Max (1 Gbps RPC)</td>
+            <td>11.2</td>
+            <td class="bad">−79.2%</td>
+            <td>16.0 (vs 86.6 local)</td>
+          </tr>
+          <tr>
+            <td>M2 Pro (1 Gbps RPC)</td>
+            <td>9.4</td>
+            <td class="bad">−82.6%</td>
+            <td>14.2 (vs 62.9 local)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p style="font-size:0.8rem;color:var(--muted);margin-top:0.5rem;">
+      <span class="e">Initial BLAS-build results showed −2% overhead but were invalid: the BLAS/Metal backend conflict caused silent local fallback (confirmed by identical acceptance rates to local baseline). No-BLAS build correctly routes draft to remote Metal GPU. Overhead is from per-op GGML_RPC protocol calls (~51–57 ms/token overhead), not network bandwidth.</span>
+      <span class="z">最初的 BLAS 版结果显示 −2% 开销，但因 BLAS/Metal 后端冲突导致静默本地回退（接受率与本地基线完全相同可确认）。无 BLAS 版本正确将 draft 路由至远程 Metal GPU。开销来自逐 op 的 GGML_RPC 协议调用（约 51–57 ms/token），而非网络带宽限制。</span>
+    </p>
+
+    <!-- Multi-machine hardware comparison -->
+    <h3 style="margin:2rem 0 0.5rem;font-size:1rem;">
+      <span class="e">Three-Machine Hardware Comparison (Qwen3.5-9B Q8_0)</span>
+      <span class="z">三机硬件对比（Qwen3.5-9B Q8_0）</span>
+    </h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><span class="e">Machine</span><span class="z">机器</span></th>
+            <th><span class="e">Mem BW</span><span class="z">内存带宽</span></th>
+            <th><span class="e">TG (tok/s)</span><span class="z">TG (tok/s)</span></th>
+            <th><span class="e">PP (tok/s)</span><span class="z">PP (tok/s)</span></th>
+            <th><span class="e">BW Util</span><span class="z">带宽利用率</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="best-row">
+            <td><strong>M2 Ultra (192 GB)</strong></td>
+            <td>800 GB/s</td>
+            <td><strong>42.4</strong></td>
+            <td>1163.9</td>
+            <td>64%</td>
+          </tr>
+          <tr>
+            <td>M1 Max (32 GB)</td>
+            <td>400 GB/s</td>
+            <td>21.8</td>
+            <td>483.7</td>
+            <td>66%</td>
+          </tr>
+          <tr>
+            <td>M2 Pro (32 GB)</td>
+            <td>200 GB/s</td>
+            <td>12.7</td>
+            <td>321.3</td>
+            <td>77%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Self-speculation + MoE Table -->
+    <h3 style="margin:2rem 0 0.5rem;font-size:1rem;">
+      <span class="e">Self-Speculative Decoding &amp; MoE (Failure Cases)</span>
+      <span class="z">自推测采样与 MoE（失效场景）</span>
+    </h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><span class="e">Target</span><span class="z">目标模型</span></th>
+            <th><span class="e">Draft</span><span class="z">Draft</span></th>
+            <th><span class="e">Ratio</span><span class="z">速比</span></th>
+            <th><span class="e">Avg TPS</span><span class="z">平均 TPS</span></th>
+            <th><span class="e">Baseline</span><span class="z">基线</span></th>
+            <th><span class="e">vs Baseline</span><span class="z">相对基线</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>4B Q8</td><td>4B Q2</td><td>1.35×</td><td>40.4</td><td>54.0</td><td class="bad">−25.2%</td></tr>
+          <tr><td>4B Q8</td><td>4B Q3</td><td>1.27×</td><td>39.7</td><td>54.0</td><td class="bad">−26.5%</td></tr>
+          <tr><td>4B Q8</td><td>4B Q4</td><td>1.08×</td><td>40.4</td><td>54.0</td><td class="bad">−25.2%</td></tr>
+          <tr><td>4B Q8</td><td>4B Q6</td><td>1.15×</td><td>40.1</td><td>54.0</td><td class="bad">−25.7%</td></tr>
+          <tr><td>35B MoE Q4</td><td>0.8B Q8</td><td>2.54×</td><td>53.7</td><td>55.2</td><td class="bad">−2.8%</td></tr>
+          <tr><td>35B MoE Q4</td><td>4B Q4</td><td>1.06×</td><td>37.7</td><td>55.2</td><td class="bad">−31.7%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ARCHITECTURE / METHODS ==================== -->
+<section id="architecture">
+  <div class="container">
+    <h2 class="section-title">
+      <span class="e">Experimental Methodology</span>
+      <span class="z">实验方法</span>
+    </h2>
+    <p class="section-sub">
+      <span class="e">Three experiments: quantization ladder, QAT vs PTQ, speculative decoding variants.</span>
+      <span class="z">三组实验：量化梯度、QAT vs PTQ、推测采样变体。</span>
+    </p>
+    <div class="arch-flow">
+      <div class="flow-box">
+        <h3><span class="e">Quantization Pipeline (llama.cpp)</span><span class="z">量化流程（llama.cpp）</span></h3>
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-text">
+            <strong><span class="e">Source</span><span class="z">来源</span>:</strong>
+            <span class="e"> HuggingFace safetensors (Qwen3.5-4B bf16)</span>
+            <span class="z"> HuggingFace safetensors（Qwen3.5-4B bf16）</span>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-text">
+            <strong><span class="e">Convert</span><span class="z">转换</span>:</strong>
+            <span class="e"> convert_hf_to_gguf.py → GGUF F16</span>
+            <span class="z"> convert_hf_to_gguf.py → GGUF F16</span>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-text">
+            <strong><span class="e">Quantize</span><span class="z">量化</span>:</strong>
+            <span class="e"> llama-quantize → Q2_K … Q8_0</span>
+            <span class="z"> llama-quantize → Q2_K … Q8_0</span>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-text">
+            <strong><span class="e">Benchmark</span><span class="z">测试</span>:</strong>
+            <span class="e"> llama-bench (N_GEN=128, 3 runs) + llama-perplexity (WikiText-2)</span>
+            <span class="z"> llama-bench（N_GEN=128, 3次）+ llama-perplexity（WikiText-2）</span>
+          </div>
+        </div>
+      </div>
+      <div class="flow-box">
+        <h3><span class="e">Speculative Decoding Setup</span><span class="z">推测采样配置</span></h3>
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-text">
+            <strong><span class="e">Tool</span><span class="z">工具</span>:</strong>
+            <span class="e"> llama-speculative (GGML_RPC=ON rebuild)</span>
+            <span class="z"> llama-speculative（GGML_RPC=ON 重编译）</span>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-text">
+            <strong><span class="e">Config</span><span class="z">配置</span>:</strong>
+            <span class="e"> N_PREDICT=200, T=0 (greedy), k∈{4,8}</span>
+            <span class="z"> N_PREDICT=200, T=0（贪婪），k∈{4,8}</span>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-text">
+            <strong><span class="e">Prompts</span><span class="z">提示词</span>:</strong>
+            <span class="e"> 3 types: code / math / text</span>
+            <span class="z"> 3 种类型：代码 / 数学 / 文本</span>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-text">
+            <strong><span class="e">Metric</span><span class="z">指标</span>:</strong>
+            <span class="e"> Effective TPS = tokens / total_time (last occurrence)</span>
+            <span class="z"> 有效 TPS = tokens / 总时间（取最后一次匹配）</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== HARDWARE ==================== -->
+<section id="hardware">
+  <div class="container">
+    <h2 class="section-title">
+      <span class="e">Hardware</span>
+      <span class="z">硬件规格</span>
+    </h2>
+    <p class="section-sub">
+      <span class="e">Three Apple Silicon machines: primary (M2 Ultra) + remote draft backends (M1 Max, M2 Pro).</span>
+      <span class="z">三台 Apple Silicon 机器：主机（M2 Ultra）+ 远程 draft 后端（M1 Max、M2 Pro）。</span>
+    </p>
+    <div class="hw-grid">
+      <div class="hw-card">
+        <h3>M2 Ultra 192 GB <span style="color:var(--accent);font-size:0.8rem;">(Primary)</span></h3>
+        <div class="hw-spec"><span class="k"><span class="e">Chip</span><span class="z">芯片</span></span><span class="v">Apple M2 Ultra</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">Memory</span><span class="z">内存</span></span><span class="v">192 GB Unified</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">Memory BW</span><span class="z">内存带宽</span></span><span class="v">800 GB/s</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">GPU Cores</span><span class="z">GPU 核心</span></span><span class="v">76</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">CPU Cores</span><span class="z">CPU 核心</span></span><span class="v">24</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">9B Q8 TG</span><span class="z">9B Q8 TG</span></span><span class="v good">42.4 tok/s</span></div>
+      </div>
+      <div class="hw-card">
+        <h3>M1 Max 32 GB <span style="color:var(--muted);font-size:0.8rem;">(RPC Backend)</span></h3>
+        <div class="hw-spec"><span class="k"><span class="e">Chip</span><span class="z">芯片</span></span><span class="v">Apple M1 Max</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">Memory</span><span class="z">内存</span></span><span class="v">32 GB Unified</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">Memory BW</span><span class="z">内存带宽</span></span><span class="v">400 GB/s</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">GPU Cores</span><span class="z">GPU 核心</span></span><span class="v">32</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">CPU Cores</span><span class="z">CPU 核心</span></span><span class="v">10</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">9B Q8 TG</span><span class="z">9B Q8 TG</span></span><span class="v">21.8 tok/s</span></div>
+      </div>
+      <div class="hw-card">
+        <h3>M2 Pro 32 GB <span style="color:var(--muted);font-size:0.8rem;">(RPC Backend)</span></h3>
+        <div class="hw-spec"><span class="k"><span class="e">Chip</span><span class="z">芯片</span></span><span class="v">Apple M2 Pro</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">Memory</span><span class="z">内存</span></span><span class="v">32 GB Unified</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">Memory BW</span><span class="z">内存带宽</span></span><span class="v">200 GB/s</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">GPU Cores</span><span class="z">GPU 核心</span></span><span class="v">19</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">CPU Cores</span><span class="z">CPU 核心</span></span><span class="v">12</span></div>
+        <div class="hw-spec"><span class="k"><span class="e">9B Q8 TG</span><span class="z">9B Q8 TG</span></span><span class="v">12.7 tok/s</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== FOOTER ==================== -->
+<footer>
+  <div class="container">
+    <p>
+      <strong>AtomGradient</strong> &middot;
+      <span class="e">March 2026 &middot; M2 Ultra 192 GB &middot; llama.cpp + MLX</span>
+      <span class="z">2026年3月 &middot; M2 Ultra 192 GB &middot; llama.cpp + MLX</span>
+    </p>
+    <p>
+      <a href="paper.pdf">
+        <span class="e">Download Paper (PDF)</span>
+        <span class="z">下载论文 (PDF)</span>
+      </a>
+      &nbsp;&middot;&nbsp;
+      <a href="https://github.com/AtomGradient/apple-silicon-llm-inference">GitHub</a>
+    </p>
+    <p class="wip-notice">
+      &#9888;
+      <span class="e">This research is ongoing. Results and conclusions may be updated.</span>
+      <span class="z">本研究尚未完成，结果和结论可能会更新。</span>
+    </p>
+    <div class="citation-box">@techreport{atomgradient2026ondevice,
+  title  = {Efficient On-Device LLM Inference on Apple Silicon:
+             From Quantization to Speculative Decoding},
+  author = {AtomGradient},
+  year   = {2026},
+  url    = {https://github.com/AtomGradient/apple-silicon-llm-inference}
+}</div>
+  </div>
+</footer>
+
+<script>
+function setLang(lang) {
+  document.documentElement.lang = lang;
+  document.getElementById('btnEN').classList.toggle('active', lang === 'en');
+  document.getElementById('btnZH').classList.toggle('active', lang === 'zh');
+}
+// Respect browser language preference on load
+if (navigator.language.startsWith('zh')) setLang('zh');
+</script>
+
+</body>
+</html>

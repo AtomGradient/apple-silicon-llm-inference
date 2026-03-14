@@ -1,0 +1,78 @@
+=== Phase 1: MLX 基准测试 (M2Ultra 192GB) ===
+N_GEN=128, N_RUNS=3
+
+[00:18:22] Gemma3-4B-QAT-3bit (2871 MB)
+  run1: 137.7 tps
+  run2: 137.3 tps
+  run3: 137.0 tps
+  avg: 137.3 ± 0.3 tps
+
+[00:18:29] Gemma3-4B-QAT-4bit (3049 MB)
+  run1: 119.1 tps
+  run2: 118.9 tps
+  run3: 118.9 tps
+  avg: 119.0 ± 0.1 tps
+
+[00:18:37] Gemma3-4B-QAT-6bit (4578 MB)
+  run1: 107.2 tps
+  run2: 106.9 tps
+  run3: 107.5 tps
+  avg: 107.2 ± 0.2 tps
+
+[00:18:45] Gemma3-4B-QAT-8bit (5715 MB)
+  run1: 96.5 tps
+  run2: 96.6 tps
+  run3: 96.1 tps
+  avg: 96.4 ± 0.2 tps
+
+[00:18:54] Qwen3.5-0.8B (1770 MB)
+  run1: 178.1 tps
+  run2: 177.7 tps
+  run3: 177.1 tps
+  avg: 177.6 ± 0.4 tps
+
+[00:18:59] Qwen3.5-4B (9343 MB)
+  run1: 59.8 tps
+  run2: 59.8 tps
+  run3: 58.4 tps
+  avg: 59.3 ± 0.7 tps
+
+[00:19:09] Qwen3.5-9B (19329 MB)
+  run1: 24.6 tps
+  run2: 28.7 tps
+  run3: 28.5 tps
+  avg: 27.3 ± 1.9 tps
+
+[00:19:30] Qwen3-8B-3bit (3600 MB)
+  run1: 98.4 tps
+  run2: 50.4 tps
+  run3: 74.3 tps
+  avg: 74.4 ± 19.6 tps
+
+[00:19:39] Qwen3-8B-4bit (4622 MB)
+  run1: 97.5 tps
+  run2: 49.0 tps
+  run3: 72.5 tps
+  avg: 73.0 ± 19.8 tps
+
+[00:19:49] Qwen3-8B-6bit (6689 MB)
+  run1: 57.8 tps
+  run2: 48.7 tps
+  run3: 56.2 tps
+  avg: 54.3 ± 4.0 tps
+
+=== 完成 10/10 ===
+结果: /Users/alex/Documents/Codes/FreeExplore/data/phase1_mlx_bench_113.csv
+
+Model                          TPS    Std   Size(MB)
+---------------------------------------------------
+Gemma3-4B-QAT-3bit           137.3    0.3       2871
+Gemma3-4B-QAT-4bit           119.0    0.1       3049
+Gemma3-4B-QAT-6bit           107.2    0.2       4578
+Gemma3-4B-QAT-8bit            96.4    0.2       5716
+Qwen3.5-0.8B                 177.6    0.4       1770
+Qwen3.5-4B                    59.3    0.7       9343
+Qwen3.5-9B                    27.3    1.9      19329
+Qwen3-8B-3bit                 74.4   19.6       3600
+Qwen3-8B-4bit                 73.0   19.8       4622
+Qwen3-8B-6bit                 54.3    4.0       6689
