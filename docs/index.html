@@ -153,6 +153,21 @@
     .finding-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.5rem; }
     .finding-card p { font-size: 0.875rem; color: var(--muted); }
     .finding-card .highlight { color: var(--accent2); font-weight: 700; }
+    .finding-card .plain {
+      margin-top: 0.8rem;
+      padding-top: 0.8rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .finding-card .plain-label {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
 
     /* --- Tables --- */
     .table-wrap { overflow-x: auto; margin: 1.5rem 0; border-radius: 10px; border: 1px solid var(--border); }
@@ -316,21 +331,28 @@
       <span class="z">核心发现</span>
     </h2>
     <p class="section-sub">
-      <span class="e">Six results from systematic benchmarking across three Apple Silicon machines.</span>
-      <span class="z">覆盖三台 Apple Silicon 设备的系统性基准测试揭示的六项关键发现。</span>
+      <span class="e">Six results from systematic benchmarking across three Apple Silicon machines — with plain-language takeaways.</span>
+      <span class="z">覆盖三台 Apple Silicon 设备的系统性基准测试，附通俗解读。</span>
     </p>
     <div class="findings-grid">
+
       <div class="finding-card">
-        <div class="icon">&#9889;</div>
+        <div class="icon">&#128202;</div>
         <h3>
-          <span class="e">Speed Ratio &gt; Acceptance Rate</span>
-          <span class="z">速比比接受率更重要</span>
+          <span class="e">Memory Bandwidth Drives Everything</span>
+          <span class="z">内存带宽决定一切</span>
         </h3>
         <p>
-          <span class="e">On Apple Silicon, SD benefit is governed by draft/target speed ratio. A <span class="highlight">3.3× ratio</span> yields +25.7% speedup even at <span class="highlight">2–4% acceptance rate</span>, due to Metal GPU batch-verification efficiency.</span>
-          <span class="z">在 Apple Silicon 上，推测采样（SD）的收益由 draft/target 速比决定。<span class="highlight">3.3× 速比</span>在仅 <span class="highlight">2–4% 接受率</span>下仍能实现 +25.7% 提速，得益于 Metal GPU 批处理验证效率。</span>
+          <span class="e">LLM token generation is memory-bound, not compute-bound. M2 Ultra (800 GB/s) runs ~3.3× faster than M2 Pro (200 GB/s) on the same model. Quantization cuts model size → fewer bytes loaded per token → faster generation.</span>
+          <span class="z">LLM 生成 token 受内存带宽限制，而非算力。M2 Ultra（800 GB/s）在同一模型上比 M2 Pro（200 GB/s）快约 3.3 倍。量化压缩模型体积 → 每个 token 读取字节更少 → 生成更快。</span>
         </p>
+        <div class="plain">
+          <div class="plain-label"><span class="e">In plain terms</span><span class="z">通俗来说</span></div>
+          <span class="e">Think of the GPU as a factory and memory bandwidth as the conveyor belt feeding it. Halve the model size, roughly halve the load time — regardless of how fast the factory is.</span>
+          <span class="z">把 GPU 想象成工厂，内存带宽是给它送料的传送带。模型体积减半，加载时间近似减半——无论工厂有多快。</span>
+        </div>
       </div>
+
       <div class="finding-card">
         <div class="icon">&#128200;</div>
         <h3>
@@ -338,21 +360,50 @@
           <span class="z">Q6_K 是 Pareto 最优点</span>
         </h3>
         <p>
-          <span class="e">Q8_0 is near-lossless (0.18% PPL). Q6_K dominates Q5_K_M on both speed and quality. Q4_K_M is the memory-constrained sweet spot. <span class="highlight">Sub-4-bit is unusable</span> (Q2_K: +267% PPL).</span>
-          <span class="z">Q8_0 近乎无损（0.18% PPL 损失）。Q6_K 在速度和质量上均优于 Q5_K_M。Q4_K_M 是内存受限场景的推荐选择。<span class="highlight">4bit 以下实际不可用</span>（Q2_K：+267% PPL）。</span>
+          <span class="e">Q8_0 is near-lossless (0.18% PPL). <span class="highlight">Q6_K ★</span> dominates Q5_K_M on both speed and quality: 1.68× faster, 59% smaller, only 0.54% quality loss. Q4_K_M suits memory-constrained setups. <span class="highlight">Sub-4-bit is unusable</span> (Q2_K: +267% PPL).</span>
+          <span class="z">Q8_0 近乎无损（0.18% PPL 损失）。<span class="highlight">Q6_K ★</span> 在速度和质量上均优于 Q5_K_M：快 1.68 倍、小 59%，质量损失仅 0.54%。Q4_K_M 适合内存受限场景。<span class="highlight">4bit 以下实际不可用</span>（Q2_K：+267% PPL）。</span>
         </p>
+        <div class="plain">
+          <div class="plain-label"><span class="e">Practical guide</span><span class="z">选择指南</span></div>
+          <span class="e"><strong>Q8_0</strong> — memory plentiful, near lossless &nbsp;·&nbsp; <strong>Q6_K ★</strong> — best balance &nbsp;·&nbsp; <strong>Q4_K_M</strong> — tight memory &nbsp;·&nbsp; <strong>Q2_K</strong> — avoid (output degenerates)</span>
+          <span class="z"><strong>Q8_0</strong> — 内存充足，近乎无损 &nbsp;·&nbsp; <strong>Q6_K ★</strong> — 最佳平衡 &nbsp;·&nbsp; <strong>Q4_K_M</strong> — 内存受限 &nbsp;·&nbsp; <strong>Q2_K</strong> — 避免使用（输出崩溃）</span>
+        </div>
       </div>
+
+      <div class="finding-card">
+        <div class="icon">&#9889;</div>
+        <h3>
+          <span class="e">Speed Ratio &gt; Acceptance Rate for SD</span>
+          <span class="z">投机解码：速比比接受率更重要</span>
+        </h3>
+        <p>
+          <span class="e">SD benefit on Apple Silicon is governed by draft/target speed ratio. A <span class="highlight">3.3× ratio</span> yields <span class="highlight">+25.7% throughput</span> even at 2–4% acceptance rate, due to Metal GPU batch-verification efficiency. Rule: draft must run ≥2.5× faster than target.</span>
+          <span class="z">在 Apple Silicon 上，SD 的收益由 draft/target 速比决定。<span class="highlight">3.3× 速比</span>在仅 2–4% 接受率下仍能实现 <span class="highlight">+25.7% 吞吐提升</span>，得益于 Metal GPU 批处理验证效率。规则：草稿模型速度需 ≥2.5 倍于目标模型。</span>
+        </p>
+        <div class="plain">
+          <div class="plain-label"><span class="e">In plain terms</span><span class="z">通俗来说</span></div>
+          <span class="e">Metal GPU verifies a batch of draft tokens almost as fast as one — so a fast draft model wins even with low acceptance. 0.8B draft (140 tok/s) + 9B target (42 tok/s) = 3.3× ratio → +25.7%.</span>
+          <span class="z">Metal GPU 验证一批草稿 token 的速度与验证单个几乎相同——快速的草稿模型即便接受率低也能盈利。0.8B 草稿（140 tok/s）+ 9B 目标（42 tok/s）= 3.3 倍 → +25.7%。</span>
+        </div>
+      </div>
+
       <div class="finding-card">
         <div class="icon">&#10060;</div>
         <h3>
-          <span class="e">Self-Speculation Fails</span>
-          <span class="z">自推测采样不可行</span>
+          <span class="e">Self-Speculation Fails on Unified Memory</span>
+          <span class="z">自推测采样在统一内存上不可行</span>
         </h3>
         <p>
-          <span class="e">Same-model-different-quant SD (4B Q2→Q8) achieves only <span class="highlight">1.35× speed ratio</span>, causing ~25% throughput <em>loss</em>. Requires ≥2.5× to break even on unified memory.</span>
-          <span class="z">同模型不同量化的 SD（4B Q2→Q8）速比仅 <span class="highlight">1.35×</span>，导致约 25% 吞吐量<em>下降</em>。统一内存架构下需 ≥2.5× 速比才能收支平衡。</span>
+          <span class="e">Same-model-different-quant SD (4B Q2→Q8) achieves only <span class="highlight">1.35× speed ratio</span>, causing ~25% throughput <em>loss</em>. Requires ≥2.5× to break even.</span>
+          <span class="z">同模型不同量化的 SD（4B Q2→Q8）速比仅 <span class="highlight">1.35×</span>，导致约 25% 吞吐量<em>下降</em>。需 ≥2.5× 速比才能收支平衡。</span>
         </p>
+        <div class="plain">
+          <div class="plain-label"><span class="e">In plain terms</span><span class="z">通俗来说</span></div>
+          <span class="e">Both the draft and target model share the same memory bus — so they can't outrun each other enough to make speculation worthwhile.</span>
+          <span class="z">草稿模型和目标模型共享同一内存总线，彼此无法拉开足够的速度差距，导致投机无利可图。</span>
+        </div>
       </div>
+
       <div class="finding-card">
         <div class="icon">&#127381;</div>
         <h3>
@@ -360,21 +411,33 @@
           <span class="z">MoE 与 SD 存在冲突</span>
         </h3>
         <p>
-          <span class="e">Qwen3.5-35B-A3B MoE achieves 55.2 tok/s (only ~3B active params). Its sparse expert routing makes draft predictions unreliable; <span class="highlight">SD offers no benefit</span>.</span>
+          <span class="e">Qwen3.5-35B-A3B MoE achieves 55.2 tok/s (only ~3B active params per token). Its sparse expert routing makes draft predictions unreliable; <span class="highlight">SD offers no benefit</span>.</span>
           <span class="z">Qwen3.5-35B-A3B MoE 达到 55.2 tok/s（每 token 仅激活 ~3B 参数）。稀疏 expert routing 使 draft 预测不可靠；<span class="highlight">SD 无益</span>。</span>
         </p>
+        <div class="plain">
+          <div class="plain-label"><span class="e">In plain terms</span><span class="z">通俗来说</span></div>
+          <span class="e">The 35B MoE already runs at small-model speeds because it activates so few parameters per token. There's no speed headroom left for a draft model to exploit.</span>
+          <span class="z">35B MoE 因每个 token 激活参数极少，本身已接近小模型速度，没有剩余的速度空间让草稿模型利用。</span>
+        </div>
       </div>
+
       <div class="finding-card">
         <div class="icon">&#128190;</div>
         <h3>
-          <span class="e">QAT Shows Smooth Gradients</span>
-          <span class="z">QAT 呈现平滑梯度</span>
+          <span class="e">QAT Shows Smooth Gradients vs PTQ</span>
+          <span class="z">QAT 呈现平滑梯度，优于 PTQ</span>
         </h3>
         <p>
-          <span class="e">Gemma-3-4B QAT spans 96→137 tok/s (3→8 bit) with <span class="highlight">σ &lt; 0.3 tok/s</span>. PTQ Qwen3-8B shows σ≈19 tok/s variance at low bit-widths.</span>
-          <span class="z">Gemma-3-4B QAT 从 8bit 到 3bit 吞吐从 96→137 tok/s，<span class="highlight">σ &lt; 0.3 tok/s</span>。PTQ Qwen3-8B 低精度下 σ≈19 tok/s 方差较大。</span>
+          <span class="e">Gemma-3-4B QAT spans 96→137 tok/s (3→8 bit) with <span class="highlight">σ &lt; 0.3 tok/s</span>. PTQ Qwen3-8B shows σ≈19 tok/s variance at low bit-widths — cross-model comparison only; architectures differ.</span>
+          <span class="z">Gemma-3-4B QAT 从 8bit 到 3bit 吞吐从 96→137 tok/s，<span class="highlight">σ &lt; 0.3 tok/s</span>。PTQ Qwen3-8B 低精度下方差达 σ≈19 tok/s——仅跨模型对比，架构不同。</span>
         </p>
+        <div class="plain">
+          <div class="plain-label"><span class="e">In plain terms</span><span class="z">通俗来说</span></div>
+          <span class="e">QAT (quantization-aware training) learns to tolerate quantization during training — producing stable, predictable performance. PTQ (quantize after training) can be erratic at low bit-widths.</span>
+          <span class="z">QAT（量化感知训练）在训练时就适应量化，性能稳定可预测。PTQ（训练后量化）在低精度时可能表现不稳定。</span>
+        </div>
       </div>
+
       <div class="finding-card">
         <div class="icon">&#9888;</div>
         <h3>
@@ -382,10 +445,16 @@
           <span class="z">跨设备 SD：GGML_RPC 不可用于生产</span>
         </h3>
         <p>
-          <span class="e">GGML_RPC cross-device SD incurs <span class="highlight">~79–83% throughput reduction</span> from per-op RPC protocol overhead (~51–57 ms/token), not network bandwidth. Initial BLAS-build results (−2%) were invalid due to silent local fallback. Purpose-built streaming protocol needed.</span>
-          <span class="z">GGML_RPC 跨设备 SD 因逐 op RPC 协议开销（约 51–57 ms/token）导致 <span class="highlight">~79–83% 吞吐下降</span>，而非网络带宽瓶颈。最初的 BLAS 版结果（−2%）因本地静默回退而无效。需要专用流式协议。</span>
+          <span class="e">GGML_RPC cross-device SD incurs <span class="highlight">~79–83% throughput reduction</span> from per-op RPC protocol overhead (~51–57 ms/token), not network bandwidth. Initial BLAS-build results (−2%) were invalid due to silent local fallback.</span>
+          <span class="z">GGML_RPC 跨设备 SD 因逐 op RPC 协议开销（约 51–57 ms/token）导致 <span class="highlight">~79–83% 吞吐下降</span>，而非网络带宽瓶颈。最初的 BLAS 版结果（−2%）因本地静默回退而无效。</span>
         </p>
+        <div class="plain">
+          <div class="plain-label"><span class="e">In plain terms</span><span class="z">通俗来说</span></div>
+          <span class="e">The bottleneck is protocol design, not the network. GGML_RPC makes ~hundreds of round-trips per token. A streaming protocol that batches the whole forward pass into one call would fix this.</span>
+          <span class="z">瓶颈在协议设计，而非网络。GGML_RPC 每个 token 发起数百次网络往返。若能将整个前向传播打包为一次调用，即可解决。</span>
+        </div>
       </div>
+
     </div>
   </div>
 </section>
